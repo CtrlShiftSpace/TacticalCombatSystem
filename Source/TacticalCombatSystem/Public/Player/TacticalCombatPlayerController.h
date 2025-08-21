@@ -6,8 +6,11 @@
 #include "GameFramework/PlayerController.h"
 #include "TacticalCombatPlayerController.generated.h"
 
-class UInputAction;
 class UInputMappingContext;
+
+struct FInputActionValue;
+class UInputAction;
+
 /**
  * 
  */
@@ -21,9 +24,14 @@ public:
 	ATacticalCombatPlayerController();
 
 protected:
-	void BeginPlay() override;
+	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 	
 private:
+
+	// 放大縮小行為的處理函式
+	void Zoom(const FInputActionValue& Value);
+	
 	// 處理輸入Mapping Context
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
 	TObjectPtr<UInputMappingContext> TactCombContext;

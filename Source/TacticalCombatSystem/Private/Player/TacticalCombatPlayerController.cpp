@@ -2,7 +2,10 @@
 
 
 #include "Player/TacticalCombatPlayerController.h"
+
 #include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+#include "Input/TacticalCombatEnhInputComponent.h"
 
 ATacticalCombatPlayerController::ATacticalCombatPlayerController()
 {
@@ -32,5 +35,17 @@ void ATacticalCombatPlayerController::BeginPlay()
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputModeData.SetHideCursorDuringCapture(false);
 	SetInputMode(InputModeData);
+}
 
+void ATacticalCombatPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	
+	UTacticalCombatEnhInputComponent* TacticalCombatEnhInputComponent = CastChecked<UTacticalCombatEnhInputComponent>(InputComponent);
+	TacticalCombatEnhInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ATacticalCombatPlayerController::Zoom);
+}
+
+void ATacticalCombatPlayerController::Zoom(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Zoom Value: %s"), *Value.ToString());
 }
