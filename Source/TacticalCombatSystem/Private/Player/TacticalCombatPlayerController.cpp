@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Input/TacticalCombatEnhInputComponent.h"
+#include "Interaction/CameraInterface.h"
 
 ATacticalCombatPlayerController::ATacticalCombatPlayerController()
 {
@@ -45,7 +46,30 @@ void ATacticalCombatPlayerController::SetupInputComponent()
 	TacticalCombatEnhInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ATacticalCombatPlayerController::Zoom);
 }
 
-void ATacticalCombatPlayerController::Zoom(const FInputActionValue& Value)
+void ATacticalCombatPlayerController::Zoom(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Zoom Value: %s"), *Value.ToString());
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		if (ControlledPawn->Implements<UCameraInterface>())
+		{
+			const float ZoomValue = InputActionValue.Get<float>();
+			if (ZoomValue == 0.f)
+			{
+				// 不進行縮放
+				return;
+			}
+			if (ZoomValue > 0.f)
+			{
+				// 放大
+				ICameraInterface::Execute_ZoomIn(ControlledPawn);
+			}
+			else
+			{
+				// 縮小
+				ICameraInterface::Execute_ZoomOut(ControlledPawn);
+			}
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Zoom Value: %s"), *InputActionValue.ToString());
 }
