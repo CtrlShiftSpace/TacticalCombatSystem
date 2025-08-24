@@ -30,5 +30,14 @@ UCLASS()
 class TACTICALCOMBATSYSTEM_API UTacticalCombatInputConfig : public UDataAsset
 {
 	GENERATED_BODY()
+
+public:
+
+	// 透過 Input Tag 取得對應的 Ability
+	const UInputAction* FindInputActionForTag(const FGameplayTag& InputTag, const bool bLogNotFound = false) const;
+	
+	// 設定 Ability 與 Input Tag 對應關係
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FTacticalCombatInputMapping> AbilityInputMappings;
 	
 };

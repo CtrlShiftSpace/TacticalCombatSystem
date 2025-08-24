@@ -5,6 +5,7 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "TacticalCombatGameplayTags.h"
 #include "Input/TacticalCombatEnhInputComponent.h"
 #include "Interaction/CameraInterface.h"
 
@@ -43,7 +44,9 @@ void ATacticalCombatPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 	
 	UTacticalCombatEnhInputComponent* TacticalCombatEnhInputComponent = CastChecked<UTacticalCombatEnhInputComponent>(InputComponent);
-	TacticalCombatEnhInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ATacticalCombatPlayerController::Zoom);
+	// TacticalCombatEnhInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ATacticalCombatPlayerController::Zoom);
+	
+	TacticalCombatEnhInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
 void ATacticalCombatPlayerController::Zoom(const FInputActionValue& InputActionValue)
@@ -72,4 +75,34 @@ void ATacticalCombatPlayerController::Zoom(const FInputActionValue& InputActionV
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Zoom Value: %s"), *InputActionValue.ToString());
+}
+
+void ATacticalCombatPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		if (InputTag.MatchesTagExact(FTacticalCombatGameplayTags::Get().InputTag_Zoom_In))
+		{
+			// 放大
+			ICameraInterface::Execute_ZoomIn(ControlledPawn);
+		}
+		else
+		{
+			if (InputTag.MatchesTagExact(FTacticalCombatGameplayTags::Get().InputTag_Zoom_Out))
+			{
+				// 縮小
+				ICameraInterface::Execute_ZoomOut(ControlledPawn);
+			}
+		}
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagPressed: %s"), *InputTag.ToString());
+}
+
+void ATacticalCombatPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+}
+
+void ATacticalCombatPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
 }

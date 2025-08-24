@@ -16,13 +16,33 @@ class TACTICALCOMBATSYSTEM_API UTacticalCombatEnhInputComponent : public UEnhanc
 	GENERATED_BODY()
 	
 public:
-
-	template<class UserClass, typename PressedFuncType, typename ReleaseedFuncType, typename HeldFuncType>
-	void BindAbilityActions(const class UTacticalCombatInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleaseedFuncType ReleaseedFunc, HeldFuncType HeldFunc);
+	template <class SourceClass, typename PressedKeyFuncType, typename ReleasedKeyFuncType, typename HeldKeyFuncType>
+	void BindAbilityActions(UTacticalCombatInputConfig* InputConfig, SourceClass* Object, PressedKeyFuncType PressedFunc, ReleasedKeyFuncType ReleasedFunc, HeldKeyFuncType HeldFunc);
 };
 
-template <class UserClass, typename PressedFuncType, typename ReleaseedFuncType, typename HeldFuncType>
-void UTacticalCombatEnhInputComponent::BindAbilityActions(const class UTacticalCombatInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleaseedFuncType ReleaseedFunc, HeldFuncType HeldFunc)
+template <class SourceClass, typename PressedKeyFuncType, typename ReleasedKeyFuncType, typename HeldKeyFuncType>
+void UTacticalCombatEnhInputComponent::BindAbilityActions(UTacticalCombatInputConfig* InputConfig, SourceClass* Object, PressedKeyFuncType PressedFunc, ReleasedKeyFuncType ReleasedFunc, HeldKeyFuncType HeldFunc)
 {
 	check(InputConfig);
+	
+	for (const FTacticalCombatInputMapping Mapping : InputConfig->AbilityInputMappings)
+	{
+		if (Mapping.InputAction && Mapping.InputTag.IsValid())
+		{
+			if (PressedFunc)
+			{
+				BindAction(Mapping.InputAction, ETriggerEvent::Started, Object, PressedFunc, Mapping.InputTag);
+			}
+
+			if (ReleasedFunc)
+			{
+				BindAction(Mapping.InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Mapping.InputTag);
+			}
+		
+			if (HeldFunc)
+			{
+				BindAction(Mapping.InputAction, ETriggerEvent::Triggered, Object, HeldFunc, Mapping.InputTag);
+			}
+		}
+	}
 }

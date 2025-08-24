@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "TacticalCombatPlayerController.generated.h"
 
+struct FGameplayTag;
+class UTacticalCombatInputConfig;
 class ATacticalCombatMonitorPawn;
 class UInputMappingContext;
 
@@ -40,9 +42,13 @@ private:
 	// 放大縮小行為
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
 	TObjectPtr<UInputAction> ZoomAction;
+	
+	// 輸入設定
+	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
+	TObjectPtr<UTacticalCombatInputConfig> InputConfig;
 
-	// // 場景中的攝影機監看物件
-	// UPROPERTY(EditDefaultsOnly, Category = "Monitor Settings")
-	// TObjectPtr<ATacticalCombatMonitorPawn> FocusMonitor;
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
 	
 };
