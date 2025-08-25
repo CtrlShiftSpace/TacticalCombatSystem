@@ -31,9 +31,6 @@ protected:
 	virtual void SetupInputComponent() override;
 	
 private:
-
-	// 放大縮小行為的處理函式
-	void Zoom(const FInputActionValue& InputActionValue);
 	
 	// 處理輸入Mapping Context
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
@@ -47,8 +44,16 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
 	TObjectPtr<UTacticalCombatInputConfig> InputConfig;
 
+	// 處理移動的 Input Action
+	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
+	TObjectPtr<UInputAction> MoveAction;
+
+	// 移動行為
+	void Move(const FInputActionValue& InputActionValue);
+	
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
+	
 	
 };

@@ -8,6 +8,7 @@
 #include "TacticalCombatGameplayTags.h"
 #include "Input/TacticalCombatEnhInputComponent.h"
 #include "Interaction/CameraInterface.h"
+#include "Interaction/MovementInterface.h"
 
 ATacticalCombatPlayerController::ATacticalCombatPlayerController()
 {
@@ -44,54 +45,44 @@ void ATacticalCombatPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 	
 	UTacticalCombatEnhInputComponent* TacticalCombatEnhInputComponent = CastChecked<UTacticalCombatEnhInputComponent>(InputComponent);
-	// TacticalCombatEnhInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ATacticalCombatPlayerController::Zoom);
-	
+	// 綁定輸入移動行為
+	TacticalCombatEnhInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	TacticalCombatEnhInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
-void ATacticalCombatPlayerController::Zoom(const FInputActionValue& InputActionValue)
+void ATacticalCombatPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	const FVector2D InputAxisVector2D = InputActionValue.Get<FVector2D>();
+	const FVector MoveVector = FVector(InputAxisVector2D.X, InputAxisVector2D.Y, 0.f);
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
-		if (ControlledPawn->Implements<UCameraInterface>())
+		if (ControlledPawn->Implements<UMovementInterface>())
 		{
-			const float ZoomValue = InputActionValue.Get<float>();
-			if (ZoomValue == 0.f)
-			{
-				// 不進行縮放
-				return;
-			}
-			if (ZoomValue > 0.f)
-			{
-				// 放大
-				ICameraInterface::Execute_ZoomIn(ControlledPawn);
-			}
-			else
-			{
-				// 縮小
-				ICameraInterface::Execute_ZoomOut(ControlledPawn);
-			}
+			IMovementInterface::Execute_AssignMovement(ControlledPawn, MoveVector);
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Zoom Value: %s"), *InputActionValue.ToString());
 }
 
 void ATacticalCombatPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
-		if (InputTag.MatchesTagExact(FTacticalCombatGameplayTags::Get().InputTag_Zoom_In))
+		// 確認角色是否實作了 CameraInterface
+		if (ControlledPawn->Implements<UCameraInterface>())
 		{
-			// 放大
-			ICameraInterface::Execute_ZoomIn(ControlledPawn);
-		}
-		else
-		{
-			if (InputTag.MatchesTagExact(FTacticalCombatGameplayTags::Get().InputTag_Zoom_Out))
+			// 根據輸入標籤來決定是放大還是縮小
+			if (InputTag.MatchesTagExact(FTacticalCombatGameplayTags::Get().InputTag_Zoom_In))
 			{
-				// 縮小
-				ICameraInterface::Execute_ZoomOut(ControlledPawn);
+				// 放大
+				ICameraInterface::Execute_ZoomIn(ControlledPawn);
+			}
+			else
+			{
+				if (InputTag.MatchesTagExact(FTacticalCombatGameplayTags::Get().InputTag_Zoom_Out))
+				{
+					// 縮小
+					ICameraInterface::Execute_ZoomOut(ControlledPawn);
+				}
 			}
 		}
 	}
