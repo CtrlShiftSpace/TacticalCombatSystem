@@ -3,6 +3,7 @@
 
 #include "Pawn/TacticalCombatMonitorPawn.h"
 #include "Camera/CameraComponent.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -17,6 +18,9 @@ ATacticalCombatMonitorPawn::ATacticalCombatMonitorPawn()
 	MonitorCamera = CreateDefaultSubobject<UCameraComponent>("MonitorCamera");
 	MonitorCamera->SetupAttachment(MonitorSpringArm);
 	MonitorCamera->bUsePawnControlRotation = false;
+
+	// 建立 Timeline 元件
+	TimelineComponent = CreateDefaultSubobject<UTimelineComponent>("TimelineComponent");
 }
 
 void ATacticalCombatMonitorPawn::BeginPlay()
@@ -24,6 +28,30 @@ void ATacticalCombatMonitorPawn::BeginPlay()
 	Super::BeginPlay();
 	// 取得預設的攝影機臂長
 	DefaultSpringArmLength = MonitorSpringArm->TargetArmLength;
+
+	// Timeline 要執行的動作
+	ZoomInterp.BindLambda([this](const float InterpValue)
+	{
+		SetZoomScale(BeforeZoomScale + InterpValue * OffsetZoomScale);
+	});
+
+	// 綁定 Timeline 完成縮放後的動作
+	ZoomFinished.BindLambda(
+		[this]()
+		{
+			bZooming = false;
+		}
+	);
+	
+	if (IsValid(MonitorCurve))
+	{
+		TimelineComponent->AddInterpFloat(MonitorCurve, ZoomInterp);
+		TimelineComponent->SetTimelineFinishedFunc(ZoomFinished);
+		TimelineComponent->SetLooping(false);
+		TimelineComponent->SetPlayRate(1.f);
+		// 設定 Timeline 的長度為最後一個 keyframe，也就是 X 軸的位置
+		TimelineComponent->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+	}
 }
 
 void ATacticalCombatMonitorPawn::PossessedBy(AController* NewController)
@@ -64,9 +92,24 @@ void ATacticalCombatMonitorPawn::AssignMovement_Implementation(const FVector& Mo
 
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
+	
 	AddMovementInput(ForwardDirection, MoveVector.Y);
 	AddMovementInput(RightDirection, MoveVector.X);
+}
+
+void ATacticalCombatMonitorPawn::ZoomScaleChanged(const float InZoomScale)
+{
+	// 正在縮放過程中要等執行完畢才能進行下一次縮放
+	if (bZooming)
+	{
+		return;
+	}
+	bZooming = true;
+	// 計算傳入倍率與目前倍率的差距
+	OffsetZoomScale = GetOffsetZoomScale(InZoomScale);
+	// 紀錄進行縮放前的倍率
+	BeforeZoomScale = ZoomScale;
+	TimelineComponent->PlayFromStart();
 }
 
 float ATacticalCombatMonitorPawn::GetZoomScale() const

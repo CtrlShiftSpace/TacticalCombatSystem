@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Interaction/CameraInterface.h"
 #include "Interaction/MovementInterface.h"
 #include "TacticalCombatMonitorPawn.generated.h"
 
+class UTimelineComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -35,12 +37,8 @@ public:
 	/* Movement Interface */
 	virtual void AssignMovement_Implementation(const FVector& MoveVector) override;
 	/** end Movement Interface */
-	
-	// 處理畫面縮放變化的Delegate
-	// UPROPERTY(BlueprintAssignable, Category = "Camera Events", meta = (DisplayName = "On Zoom Changed"))
-	// FOnZoomScaleChangedSignature OnZoomScaleChanged;
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Camera Events", meta = (DisplayName = "On Zoom Changed"))
+	UFUNCTION()
 	void ZoomScaleChanged(const float InZoomScale);
 	
 protected:
@@ -86,5 +84,28 @@ protected:
 private:
 	// 攝影機臂的預設長度
 	float DefaultSpringArmLength;
+
+	// Timeline 元件
+	UPROPERTY()
+	TObjectPtr<UTimelineComponent> TimelineComponent;
+
+	// 控制攝影機縮放的曲線
+	UPROPERTY(EditDefaultsOnly, Category = "Timeline Tools")
+	TObjectPtr<UCurveFloat> MonitorCurve;
+
+	// Timeline 更新縮放時的回呼函式
+	FOnTimelineFloatStatic ZoomInterp;
+
+	// Timeline 完成縮放時的回呼函式
+	FOnTimelineEventStatic ZoomFinished;
+
+	// 是否正在執行縮放
+	bool bZooming = false;
+
+	// 縮放前的倍率
+	float BeforeZoomScale = 1.f;
+
+	// 縮放前後的差距倍率
+	float OffsetZoomScale = 0.f;
 	
 };
