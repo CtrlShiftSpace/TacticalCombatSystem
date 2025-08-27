@@ -90,11 +90,14 @@ void ATacticalCombatMonitorPawn::AssignMovement_Implementation(const FVector& Mo
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	
-	AddMovementInput(ForwardDirection, MoveVector.Y);
-	AddMovementInput(RightDirection, MoveVector.X);
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * MoveVector.Y;
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * MoveVector.X;
+
+	// 取得移動目標方向
+	const FVector TargetDirection = (ForwardDirection + RightDirection).GetSafeNormal();
+
+	const FVector NextLocation = GetActorLocation() + TargetDirection * MoveSpeed;
+	SetActorLocation(NextLocation);
 }
 
 void ATacticalCombatMonitorPawn::ZoomScaleChanged(const float InZoomScale)

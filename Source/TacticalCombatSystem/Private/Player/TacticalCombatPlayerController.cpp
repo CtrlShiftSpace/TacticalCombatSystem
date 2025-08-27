@@ -52,8 +52,7 @@ void ATacticalCombatPlayerController::SetupInputComponent()
 
 void ATacticalCombatPlayerController::Move(const FInputActionValue& InputActionValue)
 {
-	const FVector2D InputAxisVector2D = InputActionValue.Get<FVector2D>();
-	const FVector MoveVector = FVector(InputAxisVector2D.X, InputAxisVector2D.Y, 0.f);
+	const FVector MoveVector = InputActionValue.Get<FVector>();
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
 		if (ControlledPawn->Implements<UMovementInterface>())

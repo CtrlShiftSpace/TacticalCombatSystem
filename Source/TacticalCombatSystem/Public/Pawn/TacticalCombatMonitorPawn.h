@@ -107,5 +107,8 @@ private:
 
 	// 縮放前後的差距倍率
 	float OffsetZoomScale = 0.f;
-	
+
+	// 移動速度
+	UPROPERTY(EditDefaultsOnly)
+	float MoveSpeed = 10;
 };
