@@ -13,6 +13,18 @@ class UTimelineComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
+// 用來建立 Float Timeline 曲線與事件結構
+struct FTactCombFloatTimelineEvent
+{
+	// Timeline 線段與執行Delegate
+	UCurveFloat* Curve;
+
+	FOnTimelineFloatStatic InterpDelegate;
+
+	// Timeline 結束 Delegate
+	FOnTimelineEventStatic FinishedDelegate;
+};
+
 UCLASS()
 class TACTICALCOMBATSYSTEM_API ATacticalCombatMonitorPawn : public APawn, public ICameraInterface, public IMovementInterface
 {
@@ -36,10 +48,17 @@ public:
 
 	/* Movement Interface */
 	virtual void AssignMovement_Implementation(const FVector& MoveVector) override;
+	virtual void AssignRotate_Implementation(const FRotator& Rotator) override;
 	/** end Movement Interface */
 
 	UFUNCTION()
 	void ZoomScaleChanged(const float InZoomScale);
+
+	UFUNCTION()
+	void RotatorChanged(const FRotator& InRotator);
+
+	// 建立 Float Timeline 元件的工具函式
+	void AssignTactCombFloatTimelineComponent(UTimelineComponent& TactCombTimelineComponent, const FTactCombFloatTimelineEvent& TactCombFloatTimelineEvent);
 	
 protected:
 
@@ -56,6 +75,9 @@ protected:
 	// 取得傳入倍率與目前倍率的差距
 	UFUNCTION(BlueprintPure)
 	float GetOffsetZoomScale(const float InZoomScale) const;
+
+	UFUNCTION(BlueprintPure)
+	float GetOffsetYaw(const float InYaw) const;
 	
 	// 攝影機臂用來調整攝影機位置和旋轉
 	UPROPERTY(VisibleDefaultsOnly, Category = "Camera Tools")
@@ -85,9 +107,15 @@ private:
 	// 攝影機臂的預設長度
 	float DefaultSpringArmLength;
 
+	// 攝影機的預設旋轉
+	FRotator DefaultMonitorRotator;
+
 	// Timeline 元件
 	UPROPERTY()
 	TObjectPtr<UTimelineComponent> TimelineComponent;
+
+	UPROPERTY()
+	TObjectPtr<UTimelineComponent> RotateTimelineComponent;
 
 	// 控制攝影機縮放的曲線
 	UPROPERTY(EditDefaultsOnly, Category = "Timeline Tools")
@@ -98,6 +126,26 @@ private:
 
 	// Timeline 完成縮放時的回呼函式
 	FOnTimelineEventStatic ZoomFinished;
+
+	// Timeline 更新旋轉轉動時的回呼函式
+	FOnTimelineFloatStatic RotateInterpDelegate;
+
+	// Timeline 完成旋轉時的回呼函式
+	FOnTimelineEventStatic RotateFinishedDelegate;
+
+	/**
+	 * Timeline 更新旋轉轉動時的事件
+	 * 
+	 * @param InYaw 
+	 */
+	UFUNCTION()
+	void RotateYawInterpEvent(const float InYaw);
+
+	UFUNCTION()
+	void RotateFinishedEvent();
+
+	// 旋轉曲線與事件 Timeline 結構
+	// FTactCombTimelineCurveEvent <UCurveFloat, FOnTimelineFloatStatic, void> RotateCurveEvent;
 
 	// 是否正在執行縮放
 	bool bZooming = false;
@@ -111,4 +159,13 @@ private:
 	// 移動速度
 	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed = 10;
+
+	// 是否正在執行旋轉
+	bool bRotating = false;
+
+	// 旋轉前的 Yaw
+	float BeforeYaw;
+
+	// 旋轉前後的差距 Yaw
+	float OffsetRotator;
 };

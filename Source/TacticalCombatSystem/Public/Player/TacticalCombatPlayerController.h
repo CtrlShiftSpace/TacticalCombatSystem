@@ -48,8 +48,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
 	TObjectPtr<UInputAction> MoveAction;
 
-	// 移動行為
+	// 處理旋轉的 Input Action
+	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
+	TObjectPtr<UInputAction> RotateAction;
+	
+	// 移動
 	void Move(const FInputActionValue& InputActionValue);
+
+	// 旋轉
+	void Rotate(const FInputActionValue& InputActionValue);
 	
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);

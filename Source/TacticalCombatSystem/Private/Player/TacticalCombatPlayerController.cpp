@@ -47,6 +47,7 @@ void ATacticalCombatPlayerController::SetupInputComponent()
 	UTacticalCombatEnhInputComponent* TacticalCombatEnhInputComponent = CastChecked<UTacticalCombatEnhInputComponent>(InputComponent);
 	// 綁定輸入移動行為
 	TacticalCombatEnhInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
+	TacticalCombatEnhInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ThisClass::Rotate);
 	TacticalCombatEnhInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
@@ -58,6 +59,20 @@ void ATacticalCombatPlayerController::Move(const FInputActionValue& InputActionV
 		if (ControlledPawn->Implements<UMovementInterface>())
 		{
 			IMovementInterface::Execute_AssignMovement(ControlledPawn, MoveVector);
+		}
+	}
+}
+
+void ATacticalCombatPlayerController::Rotate(const FInputActionValue& InputActionValue)
+{
+	const FVector MoveVector = InputActionValue.Get<FVector>();
+	float YawRate = MoveVector.X;
+	FRotator Rotator = FRotator(0.f, 45.f * YawRate, 0.f);
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		if (ControlledPawn->Implements<UMovementInterface>())
+		{
+			IMovementInterface::Execute_AssignRotate(ControlledPawn, Rotator);
 		}
 	}
 }

@@ -25,5 +25,8 @@ public:
 	// 依照向量移動
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void AssignMovement(const FVector& MoveVector);
-	
+
+	// 依照旋轉值旋轉
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AssignRotate(const FRotator& Rotator);
 };

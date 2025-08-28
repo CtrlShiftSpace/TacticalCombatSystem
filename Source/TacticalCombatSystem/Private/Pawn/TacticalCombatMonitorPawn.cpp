@@ -21,6 +21,7 @@ ATacticalCombatMonitorPawn::ATacticalCombatMonitorPawn()
 
 	// 建立 Timeline 元件
 	TimelineComponent = CreateDefaultSubobject<UTimelineComponent>("TimelineComponent");
+	RotateTimelineComponent = CreateDefaultSubobject<UTimelineComponent>("RotateTimelineComponent");
 }
 
 void ATacticalCombatMonitorPawn::BeginPlay()
@@ -28,6 +29,7 @@ void ATacticalCombatMonitorPawn::BeginPlay()
 	Super::BeginPlay();
 	// 取得預設的攝影機臂長
 	DefaultSpringArmLength = MonitorSpringArm->TargetArmLength;
+	DefaultMonitorRotator = GetActorRotation();
 
 	// Timeline 要執行的動作
 	ZoomInterp.BindLambda([this](const float InterpValue)
@@ -52,6 +54,24 @@ void ATacticalCombatMonitorPawn::BeginPlay()
 		// 設定 Timeline 的長度為最後一個 keyframe，也就是 X 軸的位置
 		TimelineComponent->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 	}
+
+	// 建立旋轉的 Timeline 處理
+	// RotateCurveEvent.Curve = MonitorCurve;
+	FTactCombFloatTimelineEvent RotateTimelineEvent;
+	// 綁定 Delegate 要執行的函式
+	// RotateInterpDelegate.BindUObject(this, &ThisClass::RotateYawInterpEvent);
+	// RotateFinishedDelegate.BindUObject(this, &ThisClass::RotateFinishedEvent);
+	// 將參數加入 struct 中
+	RotateTimelineEvent.Curve = MonitorCurve;
+	RotateTimelineEvent.InterpDelegate.BindLambda([this](const float InterpValue)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("RotateInterpEvent: %f"), InterpValue));
+	});
+
+	// RotateTimelineEvent.InterpDelegate.BindUObject(this, &ThisClass::RotateYawInterpEvent);
+	RotateTimelineEvent.FinishedDelegate.BindUObject(this, &ThisClass::RotateFinishedEvent);
+	// RotateTimelineComponent = CreateTactCombFloatTimelineComponent(FName("RotateTimelineComponent"), RotateTimelineEvent);
+	AssignTactCombFloatTimelineComponent(*RotateTimelineComponent.Get(), RotateTimelineEvent);
 }
 
 void ATacticalCombatMonitorPawn::PossessedBy(AController* NewController)
@@ -100,6 +120,22 @@ void ATacticalCombatMonitorPawn::AssignMovement_Implementation(const FVector& Mo
 	SetActorLocation(NextLocation);
 }
 
+void ATacticalCombatMonitorPawn::AssignRotate_Implementation(const FRotator& Rotator)
+{
+	if (bRotating)
+	{
+		return;
+	}
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("AssignRotate_Implementation: %s"), *Rotator.ToString()));
+
+	bRotating = true;
+	// 取得旋轉前的 Yaw
+	BeforeYaw = GetActorRotation().Yaw;
+	// 計算傳入 Yaw 與目前 Yaw 的差距
+	OffsetRotator = Rotator.Yaw;
+	RotateTimelineComponent->PlayFromStart();
+}
+
 void ATacticalCombatMonitorPawn::ZoomScaleChanged(const float InZoomScale)
 {
 	// 正在縮放過程中要等執行完畢才能進行下一次縮放
@@ -113,6 +149,22 @@ void ATacticalCombatMonitorPawn::ZoomScaleChanged(const float InZoomScale)
 	// 紀錄進行縮放前的倍率
 	BeforeZoomScale = ZoomScale;
 	TimelineComponent->PlayFromStart();
+}
+
+void ATacticalCombatMonitorPawn::RotatorChanged(const FRotator& InRotator)
+{
+	
+}
+
+void ATacticalCombatMonitorPawn::AssignTactCombFloatTimelineComponent(UTimelineComponent& TactCombTimelineComponent, const FTactCombFloatTimelineEvent& TactCombFloatTimelineEvent)
+{
+	// 綁定 Delegate 要執行的函式
+	TactCombTimelineComponent.AddInterpFloat(TactCombFloatTimelineEvent.Curve, TactCombFloatTimelineEvent.InterpDelegate);
+	TactCombTimelineComponent.SetTimelineFinishedFunc(TactCombFloatTimelineEvent.FinishedDelegate);
+	TactCombTimelineComponent.SetLooping(false);
+	TactCombTimelineComponent.SetPlayRate(1.f);
+	// 設定 Timeline 的長度為最後一個 keyframe，也就是 X 軸的位置
+	TactCombTimelineComponent.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 }
 
 float ATacticalCombatMonitorPawn::GetZoomScale() const
@@ -129,6 +181,22 @@ void ATacticalCombatMonitorPawn::SetZoomScale(const float InZoomScale)
 float ATacticalCombatMonitorPawn::GetOffsetZoomScale(const float InZoomScale) const
 {
 	return InZoomScale - ZoomScale;
+}
+
+float ATacticalCombatMonitorPawn::GetOffsetYaw(const float InYaw) const
+{
+	return InYaw - BeforeYaw;
+}
+
+void ATacticalCombatMonitorPawn::RotateYawInterpEvent(const float InYaw)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("RotateInterpEvent: %f"), InYaw));
+}
+
+void ATacticalCombatMonitorPawn::RotateFinishedEvent()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("RotateFinishedEvent"));
+	bRotating = false;
 }
 
 float ATacticalCombatMonitorPawn::GetScaleSpringArmLength(const float InZoomScale) const
