@@ -65,9 +65,10 @@ void ATacticalCombatPlayerController::Move(const FInputActionValue& InputActionV
 
 void ATacticalCombatPlayerController::Rotate(const FInputActionValue& InputActionValue)
 {
-	const FVector MoveVector = InputActionValue.Get<FVector>();
-	float YawRate = MoveVector.X;
-	FRotator Rotator = FRotator(0.f, 45.f * YawRate, 0.f);
+	const FVector RotatorVector = InputActionValue.Get<FVector>();
+	const float YawRate = RotatorVector.X;
+	// 旋轉角度
+	const FRotator Rotator = FRotator(0.f, RotatorYawAngle * YawRate, 0.f);
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
 		if (ControlledPawn->Implements<UMovementInterface>())

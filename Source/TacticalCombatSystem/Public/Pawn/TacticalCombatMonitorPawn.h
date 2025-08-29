@@ -55,6 +55,9 @@ public:
 	void ZoomScaleChanged(const float InZoomScale);
 
 	UFUNCTION()
+	void LocationChanged(const FVector& InLocation);
+
+	UFUNCTION()
 	void RotatorChanged(const FRotator& InRotator);
 
 	// 建立 Float Timeline 元件的工具函式
@@ -76,6 +79,7 @@ protected:
 	UFUNCTION(BlueprintPure)
 	float GetOffsetZoomScale(const float InZoomScale) const;
 
+	// 取得攝影機在不同 Yaw 時的旋轉
 	UFUNCTION(BlueprintPure)
 	float GetOffsetYaw(const float InYaw) const;
 	
@@ -110,45 +114,75 @@ private:
 	// 攝影機的預設旋轉
 	FRotator DefaultMonitorRotator;
 
-	// Timeline 元件
+	// 縮放 Timeline 元件
 	UPROPERTY()
-	TObjectPtr<UTimelineComponent> TimelineComponent;
+	TObjectPtr<UTimelineComponent> ZoomTimelineComponent;
 
+	// 旋轉 Timeline 元件
 	UPROPERTY()
 	TObjectPtr<UTimelineComponent> RotateTimelineComponent;
 
+	UPROPERTY()
+	TObjectPtr<UTimelineComponent> MoveTimelineComponent;
+	
 	// 控制攝影機縮放的曲線
 	UPROPERTY(EditDefaultsOnly, Category = "Timeline Tools")
-	TObjectPtr<UCurveFloat> MonitorCurve;
+	TObjectPtr<UCurveFloat> MonitorZoomCurve;
 
-	// Timeline 更新縮放時的回呼函式
-	FOnTimelineFloatStatic ZoomInterp;
+	// 控制攝影機移動的曲線
+	UPROPERTY(EditDefaultsOnly, Category = "Timeline Tools")
+	TObjectPtr<UCurveFloat> MonitorMoveCurve;
 
-	// Timeline 完成縮放時的回呼函式
-	FOnTimelineEventStatic ZoomFinished;
+	// 控制攝影機旋轉的曲線
+	UPROPERTY(EditDefaultsOnly, Category = "Timeline Tools")
+	TObjectPtr<UCurveFloat> MonitorRotateCurve;
 
-	// Timeline 更新旋轉轉動時的回呼函式
-	FOnTimelineFloatStatic RotateInterpDelegate;
+	/**
+	 * Timeline 更新縮放時的事件
+	 * 
+	 * @param InterpValue 插值
+	 */
+	UFUNCTION()
+	void ZoomInterpEvent(const float InterpValue);
 
-	// Timeline 完成旋轉時的回呼函式
-	FOnTimelineEventStatic RotateFinishedDelegate;
+	/**
+	 * Timeline 更新完成縮放的事件
+	 */
+	UFUNCTION()
+	void ZoomFinishedEvent();
 
+
+	/**
+	 * Timeline 更新移動時的事件
+	 * 
+	 * @param InterpValue 插值
+	 */
+	UFUNCTION()
+	void MoveInterpEvent(const float InterpValue);
+
+	/**
+	 * Timeline 更新完成移動的事件
+	 */
+	UFUNCTION()
+	void MoveFinishedEvent();
+	
 	/**
 	 * Timeline 更新旋轉轉動時的事件
 	 * 
-	 * @param InYaw 
+	 * @param InterpValue 
 	 */
 	UFUNCTION()
-	void RotateYawInterpEvent(const float InYaw);
+	void RotateYawInterpEvent(const float InterpValue);
 
+	/**
+	 * Timeline 更新完成旋轉的事件
+	 */
 	UFUNCTION()
 	void RotateFinishedEvent();
-
-	// 旋轉曲線與事件 Timeline 結構
-	// FTactCombTimelineCurveEvent <UCurveFloat, FOnTimelineFloatStatic, void> RotateCurveEvent;
-
-	// 是否正在執行縮放
+	
 	bool bZooming = false;
+	bool bMoving = false;
+	bool bRotating = false;
 
 	// 縮放前的倍率
 	float BeforeZoomScale = 1.f;
@@ -158,14 +192,17 @@ private:
 
 	// 移動速度
 	UPROPERTY(EditDefaultsOnly)
-	float MoveSpeed = 10;
+	float MoveSpeed = 300.f;
 
-	// 是否正在執行旋轉
-	bool bRotating = false;
+	// 移動前的位置
+	FVector BeforeLocation;
+
+	// 移動前後的差距位置
+	FVector OffsetLocation;
 
 	// 旋轉前的 Yaw
 	float BeforeYaw;
 
 	// 旋轉前後的差距 Yaw
-	float OffsetRotator;
+	float OffsetYaw;
 };

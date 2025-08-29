@@ -20,7 +20,8 @@ ATacticalCombatMonitorPawn::ATacticalCombatMonitorPawn()
 	MonitorCamera->bUsePawnControlRotation = false;
 
 	// 建立 Timeline 元件
-	TimelineComponent = CreateDefaultSubobject<UTimelineComponent>("TimelineComponent");
+	ZoomTimelineComponent = CreateDefaultSubobject<UTimelineComponent>("ZoomTimelineComponent");
+	MoveTimelineComponent = CreateDefaultSubobject<UTimelineComponent>("MoveTimelineComponent");
 	RotateTimelineComponent = CreateDefaultSubobject<UTimelineComponent>("RotateTimelineComponent");
 }
 
@@ -30,48 +31,47 @@ void ATacticalCombatMonitorPawn::BeginPlay()
 	// 取得預設的攝影機臂長
 	DefaultSpringArmLength = MonitorSpringArm->TargetArmLength;
 	DefaultMonitorRotator = GetActorRotation();
-
-	// Timeline 要執行的動作
-	ZoomInterp.BindLambda([this](const float InterpValue)
-	{
-		SetZoomScale(BeforeZoomScale + InterpValue * OffsetZoomScale);
-	});
-
-	// 綁定 Timeline 完成縮放後的動作
-	ZoomFinished.BindLambda(
-		[this]()
-		{
-			bZooming = false;
-		}
-	);
 	
-	if (IsValid(MonitorCurve))
+	if (IsValid(MonitorZoomCurve))
 	{
-		TimelineComponent->AddInterpFloat(MonitorCurve, ZoomInterp);
-		TimelineComponent->SetTimelineFinishedFunc(ZoomFinished);
-		TimelineComponent->SetLooping(false);
-		TimelineComponent->SetPlayRate(1.f);
-		// 設定 Timeline 的長度為最後一個 keyframe，也就是 X 軸的位置
-		TimelineComponent->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+		// 建立旋轉的 Timeline 參數與事件
+		FTactCombFloatTimelineEvent ZoomTimelineEvent;
+		ZoomTimelineEvent.Curve = MonitorZoomCurve;
+		// 綁定 Delegate 要執行的函式
+		ZoomTimelineEvent.InterpDelegate.BindUObject(this, &ThisClass::ZoomInterpEvent);
+		ZoomTimelineEvent.FinishedDelegate.BindUObject(this, &ThisClass::ZoomFinishedEvent);
+		AssignTactCombFloatTimelineComponent(*ZoomTimelineComponent, ZoomTimelineEvent);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("MonitorZoomCurve is not valid"));
 	}
 
-	// 建立旋轉的 Timeline 處理
-	// RotateCurveEvent.Curve = MonitorCurve;
-	FTactCombFloatTimelineEvent RotateTimelineEvent;
-	// 綁定 Delegate 要執行的函式
-	// RotateInterpDelegate.BindUObject(this, &ThisClass::RotateYawInterpEvent);
-	// RotateFinishedDelegate.BindUObject(this, &ThisClass::RotateFinishedEvent);
-	// 將參數加入 struct 中
-	RotateTimelineEvent.Curve = MonitorCurve;
-	RotateTimelineEvent.InterpDelegate.BindLambda([this](const float InterpValue)
+	if (IsValid(MonitorZoomCurve))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("RotateInterpEvent: %f"), InterpValue));
-	});
+		// 建立移動的 Timeline 參數與事件
+		FTactCombFloatTimelineEvent MoveTimelineEvent;
+		MoveTimelineEvent.Curve = MonitorZoomCurve;
+		// 綁定 Delegate 要執行的函式
+		MoveTimelineEvent.InterpDelegate.BindUObject(this, &ThisClass::MoveInterpEvent);
+		MoveTimelineEvent.FinishedDelegate.BindUObject(this, &ThisClass::MoveFinishedEvent);
+		AssignTactCombFloatTimelineComponent(*MoveTimelineComponent, MoveTimelineEvent);
+	}
 
-	// RotateTimelineEvent.InterpDelegate.BindUObject(this, &ThisClass::RotateYawInterpEvent);
-	RotateTimelineEvent.FinishedDelegate.BindUObject(this, &ThisClass::RotateFinishedEvent);
-	// RotateTimelineComponent = CreateTactCombFloatTimelineComponent(FName("RotateTimelineComponent"), RotateTimelineEvent);
-	AssignTactCombFloatTimelineComponent(*RotateTimelineComponent.Get(), RotateTimelineEvent);
+	if (IsValid(MonitorRotateCurve))
+	{
+		// 建立旋轉的 Timeline 參數與事件
+		FTactCombFloatTimelineEvent RotateTimelineEvent;
+		RotateTimelineEvent.Curve = MonitorRotateCurve;
+		// 綁定 Delegate 要執行的函式
+		RotateTimelineEvent.InterpDelegate.BindUObject(this, &ThisClass::RotateYawInterpEvent);
+		RotateTimelineEvent.FinishedDelegate.BindUObject(this, &ThisClass::RotateFinishedEvent);
+		AssignTactCombFloatTimelineComponent(*RotateTimelineComponent, RotateTimelineEvent);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("MonitorRotateCurve is not valid"));
+	}
 }
 
 void ATacticalCombatMonitorPawn::PossessedBy(AController* NewController)
@@ -107,37 +107,35 @@ void ATacticalCombatMonitorPawn::ZoomOut_Implementation()
 
 void ATacticalCombatMonitorPawn::AssignMovement_Implementation(const FVector& MoveVector)
 {
-	const FRotator Rotation = GetControlRotation();
+	const FRotator Rotation = GetActorRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * MoveVector.Y;
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * MoveVector.X;
 
 	// 取得移動目標方向
 	const FVector TargetDirection = (ForwardDirection + RightDirection).GetSafeNormal();
-
-	const FVector NextLocation = GetActorLocation() + TargetDirection * MoveSpeed;
-	SetActorLocation(NextLocation);
+	const FVector MoveLocation = GetActorLocation() + TargetDirection * MoveSpeed;
+	// 移動至新的位置
+	LocationChanged(MoveLocation);
 }
 
 void ATacticalCombatMonitorPawn::AssignRotate_Implementation(const FRotator& Rotator)
 {
-	if (bRotating)
+	// 過濾掉沒有旋轉的情況
+	if (Rotator.IsZero())
 	{
 		return;
 	}
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("AssignRotate_Implementation: %s"), *Rotator.ToString()));
-
-	bRotating = true;
-	// 取得旋轉前的 Yaw
-	BeforeYaw = GetActorRotation().Yaw;
-	// 計算傳入 Yaw 與目前 Yaw 的差距
-	OffsetRotator = Rotator.Yaw;
-	RotateTimelineComponent->PlayFromStart();
+	RotatorChanged(Rotator);
 }
 
 void ATacticalCombatMonitorPawn::ZoomScaleChanged(const float InZoomScale)
 {
+	// 檢查縮放曲線是否有效
+	if (!IsValid(MonitorZoomCurve))
+	{
+		return;
+	}
 	// 正在縮放過程中要等執行完畢才能進行下一次縮放
 	if (bZooming)
 	{
@@ -148,12 +146,48 @@ void ATacticalCombatMonitorPawn::ZoomScaleChanged(const float InZoomScale)
 	OffsetZoomScale = GetOffsetZoomScale(InZoomScale);
 	// 紀錄進行縮放前的倍率
 	BeforeZoomScale = ZoomScale;
-	TimelineComponent->PlayFromStart();
+	ZoomTimelineComponent->PlayFromStart();
+}
+
+void ATacticalCombatMonitorPawn::LocationChanged(const FVector& InLocation)
+{
+	// 檢查移動曲線是否有效
+	if (!IsValid(MonitorMoveCurve))
+	{
+		return;
+	}
+	// 正在移動過程中要等執行完畢才能進行下一次移動
+	if (bMoving)
+	{
+		return;
+	}
+	bMoving = true;
+	// 取得移動前的位置
+	BeforeLocation = GetActorLocation();
+	// 計算傳入位置與目前位置的差距
+	OffsetLocation = InLocation - BeforeLocation;
+	MoveTimelineComponent->PlayFromStart();
 }
 
 void ATacticalCombatMonitorPawn::RotatorChanged(const FRotator& InRotator)
 {
+	// 檢查旋轉曲線是否有效
+	if (!IsValid(MonitorRotateCurve))
+	{
+		return;
+	}
+	// 正在旋轉過程中要等執行完畢才能進行下一次旋轉
+	if (bRotating)
+	{
+		return;
+	}
 	
+	bRotating = true;
+	// 取得旋轉前的 Yaw
+	BeforeYaw = GetActorRotation().Yaw;
+	// 計算傳入 Yaw 與目前 Yaw 的差距
+	OffsetYaw = InRotator.Yaw;
+	RotateTimelineComponent->PlayFromStart();
 }
 
 void ATacticalCombatMonitorPawn::AssignTactCombFloatTimelineComponent(UTimelineComponent& TactCombTimelineComponent, const FTactCombFloatTimelineEvent& TactCombFloatTimelineEvent)
@@ -188,9 +222,35 @@ float ATacticalCombatMonitorPawn::GetOffsetYaw(const float InYaw) const
 	return InYaw - BeforeYaw;
 }
 
-void ATacticalCombatMonitorPawn::RotateYawInterpEvent(const float InYaw)
+void ATacticalCombatMonitorPawn::ZoomInterpEvent(const float InterpValue)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("RotateInterpEvent: %f"), InYaw));
+	SetZoomScale(BeforeZoomScale + InterpValue * OffsetZoomScale);
+}
+
+void ATacticalCombatMonitorPawn::ZoomFinishedEvent()
+{
+	bZooming = false;
+}
+
+void ATacticalCombatMonitorPawn::MoveInterpEvent(const float InterpValue)
+{
+	// 計算本次要移動到的位置
+	const FVector InterpLocation = BeforeLocation + OffsetLocation * InterpValue;
+	SetActorLocation(InterpLocation);
+}
+
+void ATacticalCombatMonitorPawn::MoveFinishedEvent()
+{
+	bMoving = false;
+}
+
+void ATacticalCombatMonitorPawn::RotateYawInterpEvent(const float InterpValue)
+{
+	// 取得插值的旋轉位置
+	FRotator InterpRotator = GetActorRotation();
+	// 計算本次要旋轉到的 Yaw 位置
+	InterpRotator.Yaw = BeforeYaw + OffsetYaw * InterpValue;
+	SetActorRotation(InterpRotator);
 }
 
 void ATacticalCombatMonitorPawn::RotateFinishedEvent()

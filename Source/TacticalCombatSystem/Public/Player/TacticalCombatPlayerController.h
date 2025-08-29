@@ -61,6 +61,8 @@ private:
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
-	
+
+	// 旋轉角度
+	float RotatorYawAngle = 45.f;
 	
 };
