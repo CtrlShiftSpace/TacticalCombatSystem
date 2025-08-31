@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/TacticalCombatCharacterBase.h"
-#include "TacticalCombatCharacter.generated.h"
+#include "Character/TactCombCharacterBase.h"
+#include "TactCombCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TACTICALCOMBATSYSTEM_API ATacticalCombatCharacter : public ATacticalCombatCharacterBase
+class TACTICALCOMBATSYSTEM_API ATactCombCharacter : public ATactCombCharacterBase
 {
 	GENERATED_BODY()
 

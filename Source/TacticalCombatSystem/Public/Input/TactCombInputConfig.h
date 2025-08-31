@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
-#include "TacticalCombatInputConfig.generated.h"
+#include "TactCombInputConfig.generated.h"
 
 class UInputAction;
 
@@ -27,7 +27,7 @@ struct FTacticalCombatInputMapping
  * 
  */
 UCLASS()
-class TACTICALCOMBATSYSTEM_API UTacticalCombatInputConfig : public UDataAsset
+class TACTICALCOMBATSYSTEM_API UTactCombInputConfig : public UDataAsset
 {
 	GENERATED_BODY()
 

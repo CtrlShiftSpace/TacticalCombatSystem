@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "TacticalCombatCharacterBase.generated.h"
+#include "TactCombCharacterBase.generated.h"
 
 UCLASS(Abstract)
-class TACTICALCOMBATSYSTEM_API ATacticalCombatCharacterBase : public ACharacter
+class TACTICALCOMBATSYSTEM_API ATactCombCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ATacticalCombatCharacterBase();
+	ATactCombCharacterBase();
 
 protected:
 	// Called when the game starts or when spawned

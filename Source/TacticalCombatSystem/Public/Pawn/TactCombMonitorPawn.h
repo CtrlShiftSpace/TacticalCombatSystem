@@ -7,7 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "Interaction/CameraInterface.h"
 #include "Interaction/MovementInterface.h"
-#include "TacticalCombatMonitorPawn.generated.h"
+#include "TactCombMonitorPawn.generated.h"
 
 class UTimelineComponent;
 class UCameraComponent;
@@ -26,12 +26,12 @@ struct FTactCombFloatTimelineEvent
 };
 
 UCLASS()
-class TACTICALCOMBATSYSTEM_API ATacticalCombatMonitorPawn : public APawn, public ICameraInterface, public IMovementInterface
+class TACTICALCOMBATSYSTEM_API ATactCombMonitorPawn : public APawn, public ICameraInterface, public IMovementInterface
 {
 	GENERATED_BODY()
 
 public:
-	ATacticalCombatMonitorPawn();
+	ATactCombMonitorPawn();
 	virtual void BeginPlay() override;
 	
 	/**

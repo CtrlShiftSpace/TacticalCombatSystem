@@ -1,21 +1,21 @@
 // Copyright  CtrlShiftSpace
 
 
-#include "Player/TacticalCombatPlayerController.h"
+#include "Player/TactCombPlayerController.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "TacticalCombatGameplayTags.h"
-#include "Input/TacticalCombatEnhInputComponent.h"
+#include "TactCombGameplayTags.h"
+#include "Input/TactCombEnhInputComponent.h"
 #include "Interaction/CameraInterface.h"
 #include "Interaction/MovementInterface.h"
 
-ATacticalCombatPlayerController::ATacticalCombatPlayerController()
+ATactCombPlayerController::ATactCombPlayerController()
 {
 	bReplicates = true;
 }
 
-void ATacticalCombatPlayerController::BeginPlay()
+void ATactCombPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -40,18 +40,18 @@ void ATacticalCombatPlayerController::BeginPlay()
 	SetInputMode(InputModeData);
 }
 
-void ATacticalCombatPlayerController::SetupInputComponent()
+void ATactCombPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	
-	UTacticalCombatEnhInputComponent* TacticalCombatEnhInputComponent = CastChecked<UTacticalCombatEnhInputComponent>(InputComponent);
+	UTactCombEnhInputComponent* TacticalCombatEnhInputComponent = CastChecked<UTactCombEnhInputComponent>(InputComponent);
 	// 綁定輸入移動行為
 	TacticalCombatEnhInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	TacticalCombatEnhInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ThisClass::Rotate);
 	TacticalCombatEnhInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
-void ATacticalCombatPlayerController::Move(const FInputActionValue& InputActionValue)
+void ATactCombPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector MoveVector = InputActionValue.Get<FVector>();
 	if (APawn* ControlledPawn = GetPawn<APawn>())
@@ -63,7 +63,7 @@ void ATacticalCombatPlayerController::Move(const FInputActionValue& InputActionV
 	}
 }
 
-void ATacticalCombatPlayerController::Rotate(const FInputActionValue& InputActionValue)
+void ATactCombPlayerController::Rotate(const FInputActionValue& InputActionValue)
 {
 	const FVector RotatorVector = InputActionValue.Get<FVector>();
 	const float YawRate = RotatorVector.X;
@@ -78,7 +78,7 @@ void ATacticalCombatPlayerController::Rotate(const FInputActionValue& InputActio
 	}
 }
 
-void ATacticalCombatPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+void ATactCombPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
@@ -86,14 +86,14 @@ void ATacticalCombatPlayerController::AbilityInputTagPressed(FGameplayTag InputT
 		if (ControlledPawn->Implements<UCameraInterface>())
 		{
 			// 根據輸入標籤來決定是放大還是縮小
-			if (InputTag.MatchesTagExact(FTacticalCombatGameplayTags::Get().InputTag_Zoom_In))
+			if (InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Zoom_In))
 			{
 				// 放大
 				ICameraInterface::Execute_ZoomIn(ControlledPawn);
 			}
 			else
 			{
-				if (InputTag.MatchesTagExact(FTacticalCombatGameplayTags::Get().InputTag_Zoom_Out))
+				if (InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Zoom_Out))
 				{
 					// 縮小
 					ICameraInterface::Execute_ZoomOut(ControlledPawn);
@@ -105,10 +105,10 @@ void ATacticalCombatPlayerController::AbilityInputTagPressed(FGameplayTag InputT
 	UE_LOG(LogTemp, Warning, TEXT("AbilityInputTagPressed: %s"), *InputTag.ToString());
 }
 
-void ATacticalCombatPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+void ATactCombPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
 }
 
-void ATacticalCombatPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+void ATactCombPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
 }

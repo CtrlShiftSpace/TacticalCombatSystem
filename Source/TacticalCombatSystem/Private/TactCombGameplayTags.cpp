@@ -1,17 +1,17 @@
 // Copyright  CtrlShiftSpace
 
-#include "TacticalCombatGameplayTags.h"
+#include "TactCombGameplayTags.h"
 #include "GameplayTagsManager.h"
 
 // 靜態變數初始化
-FTacticalCombatGameplayTags FTacticalCombatGameplayTags::GameplayTags;
+FTactCombGameplayTags FTactCombGameplayTags::GameplayTags;
 
-const FTacticalCombatGameplayTags& FTacticalCombatGameplayTags::Get()
+const FTactCombGameplayTags& FTactCombGameplayTags::Get()
 {
 	return GameplayTags;
 }
 
-void FTacticalCombatGameplayTags::InitializeNativeGameplayTags()
+void FTactCombGameplayTags::InitializeNativeGameplayTags()
 {
 	GameplayTags.InputTag_Zoom_In = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.Zoom.In"),

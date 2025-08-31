@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "TacticalCombatPlayerController.generated.h"
+#include "TactCombPlayerController.generated.h"
 
 struct FGameplayTag;
-class UTacticalCombatInputConfig;
-class ATacticalCombatMonitorPawn;
+class UTactCombInputConfig;
+class ATactCombMonitorPawn;
 class UInputMappingContext;
 
 struct FInputActionValue;
@@ -18,13 +18,13 @@ class UInputAction;
  * 
  */
 UCLASS()
-class TACTICALCOMBATSYSTEM_API ATacticalCombatPlayerController : public APlayerController
+class TACTICALCOMBATSYSTEM_API ATactCombPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
 public:
 	// 建構式
-	ATacticalCombatPlayerController();
+	ATactCombPlayerController();
 
 protected:
 	virtual void BeginPlay() override;
@@ -42,7 +42,7 @@ private:
 	
 	// 輸入設定
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
-	TObjectPtr<UTacticalCombatInputConfig> InputConfig;
+	TObjectPtr<UTactCombInputConfig> InputConfig;
 
 	// 處理移動的 Input Action
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")

@@ -4,24 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "EnhancedInputComponent.h"
-#include "TacticalCombatInputConfig.h"
-#include "TacticalCombatEnhInputComponent.generated.h"
+#include "TactCombInputConfig.h"
+#include "TactCombEnhInputComponent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TACTICALCOMBATSYSTEM_API UTacticalCombatEnhInputComponent : public UEnhancedInputComponent
+class TACTICALCOMBATSYSTEM_API UTactCombEnhInputComponent : public UEnhancedInputComponent
 {
 	GENERATED_BODY()
 	
 public:
 	template <class SourceClass, typename PressedKeyFuncType, typename ReleasedKeyFuncType, typename HeldKeyFuncType>
-	void BindAbilityActions(UTacticalCombatInputConfig* InputConfig, SourceClass* Object, PressedKeyFuncType PressedFunc, ReleasedKeyFuncType ReleasedFunc, HeldKeyFuncType HeldFunc);
+	void BindAbilityActions(UTactCombInputConfig* InputConfig, SourceClass* Object, PressedKeyFuncType PressedFunc, ReleasedKeyFuncType ReleasedFunc, HeldKeyFuncType HeldFunc);
 };
 
 template <class SourceClass, typename PressedKeyFuncType, typename ReleasedKeyFuncType, typename HeldKeyFuncType>
-void UTacticalCombatEnhInputComponent::BindAbilityActions(UTacticalCombatInputConfig* InputConfig, SourceClass* Object, PressedKeyFuncType PressedFunc, ReleasedKeyFuncType ReleasedFunc, HeldKeyFuncType HeldFunc)
+void UTactCombEnhInputComponent::BindAbilityActions(UTactCombInputConfig* InputConfig, SourceClass* Object, PressedKeyFuncType PressedFunc, ReleasedKeyFuncType ReleasedFunc, HeldKeyFuncType HeldFunc)
 {
 	check(InputConfig);
 	

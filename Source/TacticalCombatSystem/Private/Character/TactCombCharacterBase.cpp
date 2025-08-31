@@ -1,10 +1,10 @@
 // Copyright  CtrlShiftSpace
 
 
-#include "Character/TacticalCombatCharacterBase.h"
+#include "Character/TactCombCharacterBase.h"
 
 // Sets default values
-ATacticalCombatCharacterBase::ATacticalCombatCharacterBase()
+ATactCombCharacterBase::ATactCombCharacterBase()
 {
 	// 取消使用 Tick
 	PrimaryActorTick.bCanEverTick = false;
@@ -12,7 +12,7 @@ ATacticalCombatCharacterBase::ATacticalCombatCharacterBase()
 }
 
 // Called when the game starts or when spawned
-void ATacticalCombatCharacterBase::BeginPlay()
+void ATactCombCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	

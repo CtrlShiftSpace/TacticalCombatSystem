@@ -1,13 +1,13 @@
 // Copyright  CtrlShiftSpace
 
 
-#include "Pawn/TacticalCombatMonitorPawn.h"
+#include "Pawn/TactCombMonitorPawn.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
-ATacticalCombatMonitorPawn::ATacticalCombatMonitorPawn()
+ATactCombMonitorPawn::ATactCombMonitorPawn()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -25,7 +25,7 @@ ATacticalCombatMonitorPawn::ATacticalCombatMonitorPawn()
 	RotateTimelineComponent = CreateDefaultSubobject<UTimelineComponent>("RotateTimelineComponent");
 }
 
-void ATacticalCombatMonitorPawn::BeginPlay()
+void ATactCombMonitorPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	// 取得預設的攝影機臂長
@@ -74,14 +74,14 @@ void ATacticalCombatMonitorPawn::BeginPlay()
 	}
 }
 
-void ATacticalCombatMonitorPawn::PossessedBy(AController* NewController)
+void ATactCombMonitorPawn::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	
-	UE_LOG(LogTemp, Warning, TEXT("ATacticalCombatMonitorPawn::PossessedBy, NewController Name: %s"), *NewController->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("ATactCombMonitorPawn::PossessedBy, NewController Name: %s"), *NewController->GetName());
 }
 
-void ATacticalCombatMonitorPawn::ZoomIn_Implementation()
+void ATactCombMonitorPawn::ZoomIn_Implementation()
 {
 	// 新的縮放倍率
 	const float NewZoomScale = FMath::Clamp(ZoomScale + ZoomScaleUnit, MinZoomScale, MaxZoomScale);
@@ -93,7 +93,7 @@ void ATacticalCombatMonitorPawn::ZoomIn_Implementation()
 	ZoomScaleChanged(NewZoomScale);
 }
 
-void ATacticalCombatMonitorPawn::ZoomOut_Implementation()
+void ATactCombMonitorPawn::ZoomOut_Implementation()
 {
 	// 新的縮放倍率
 	const float NewZoomScale = FMath::Clamp(ZoomScale - ZoomScaleUnit, MinZoomScale, MaxZoomScale);
@@ -105,7 +105,7 @@ void ATacticalCombatMonitorPawn::ZoomOut_Implementation()
 	ZoomScaleChanged(NewZoomScale);
 }
 
-void ATacticalCombatMonitorPawn::AssignMovement_Implementation(const FVector& MoveVector)
+void ATactCombMonitorPawn::AssignMovement_Implementation(const FVector& MoveVector)
 {
 	const FRotator Rotation = GetActorRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
@@ -119,7 +119,7 @@ void ATacticalCombatMonitorPawn::AssignMovement_Implementation(const FVector& Mo
 	LocationChanged(MoveLocation);
 }
 
-void ATacticalCombatMonitorPawn::AssignRotate_Implementation(const FRotator& Rotator)
+void ATactCombMonitorPawn::AssignRotate_Implementation(const FRotator& Rotator)
 {
 	// 過濾掉沒有旋轉的情況
 	if (Rotator.IsZero())
@@ -129,7 +129,7 @@ void ATacticalCombatMonitorPawn::AssignRotate_Implementation(const FRotator& Rot
 	RotatorChanged(Rotator);
 }
 
-void ATacticalCombatMonitorPawn::ZoomScaleChanged(const float InZoomScale)
+void ATactCombMonitorPawn::ZoomScaleChanged(const float InZoomScale)
 {
 	// 檢查縮放曲線是否有效
 	if (!IsValid(MonitorZoomCurve))
@@ -149,7 +149,7 @@ void ATacticalCombatMonitorPawn::ZoomScaleChanged(const float InZoomScale)
 	ZoomTimelineComponent->PlayFromStart();
 }
 
-void ATacticalCombatMonitorPawn::LocationChanged(const FVector& InLocation)
+void ATactCombMonitorPawn::LocationChanged(const FVector& InLocation)
 {
 	// 檢查移動曲線是否有效
 	if (!IsValid(MonitorMoveCurve))
@@ -169,7 +169,7 @@ void ATacticalCombatMonitorPawn::LocationChanged(const FVector& InLocation)
 	MoveTimelineComponent->PlayFromStart();
 }
 
-void ATacticalCombatMonitorPawn::RotatorChanged(const FRotator& InRotator)
+void ATactCombMonitorPawn::RotatorChanged(const FRotator& InRotator)
 {
 	// 檢查旋轉曲線是否有效
 	if (!IsValid(MonitorRotateCurve))
@@ -190,7 +190,7 @@ void ATacticalCombatMonitorPawn::RotatorChanged(const FRotator& InRotator)
 	RotateTimelineComponent->PlayFromStart();
 }
 
-void ATacticalCombatMonitorPawn::AssignTactCombFloatTimelineComponent(UTimelineComponent& TactCombTimelineComponent, const FTactCombFloatTimelineEvent& TactCombFloatTimelineEvent)
+void ATactCombMonitorPawn::AssignTactCombFloatTimelineComponent(UTimelineComponent& TactCombTimelineComponent, const FTactCombFloatTimelineEvent& TactCombFloatTimelineEvent)
 {
 	// 綁定 Delegate 要執行的函式
 	TactCombTimelineComponent.AddInterpFloat(TactCombFloatTimelineEvent.Curve, TactCombFloatTimelineEvent.InterpDelegate);
@@ -201,50 +201,50 @@ void ATacticalCombatMonitorPawn::AssignTactCombFloatTimelineComponent(UTimelineC
 	TactCombTimelineComponent.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 }
 
-float ATacticalCombatMonitorPawn::GetZoomScale() const
+float ATactCombMonitorPawn::GetZoomScale() const
 {
 	return ZoomScale;
 }
 
-void ATacticalCombatMonitorPawn::SetZoomScale(const float InZoomScale)
+void ATactCombMonitorPawn::SetZoomScale(const float InZoomScale)
 {
 	ZoomScale = FMath::Clamp(InZoomScale, MinZoomScale, MaxZoomScale);
 	MonitorSpringArm->TargetArmLength = GetScaleSpringArmLength(ZoomScale);
 }
 
-float ATacticalCombatMonitorPawn::GetOffsetZoomScale(const float InZoomScale) const
+float ATactCombMonitorPawn::GetOffsetZoomScale(const float InZoomScale) const
 {
 	return InZoomScale - ZoomScale;
 }
 
-float ATacticalCombatMonitorPawn::GetOffsetYaw(const float InYaw) const
+float ATactCombMonitorPawn::GetOffsetYaw(const float InYaw) const
 {
 	return InYaw - BeforeYaw;
 }
 
-void ATacticalCombatMonitorPawn::ZoomInterpEvent(const float InterpValue)
+void ATactCombMonitorPawn::ZoomInterpEvent(const float InterpValue)
 {
 	SetZoomScale(BeforeZoomScale + InterpValue * OffsetZoomScale);
 }
 
-void ATacticalCombatMonitorPawn::ZoomFinishedEvent()
+void ATactCombMonitorPawn::ZoomFinishedEvent()
 {
 	bZooming = false;
 }
 
-void ATacticalCombatMonitorPawn::MoveInterpEvent(const float InterpValue)
+void ATactCombMonitorPawn::MoveInterpEvent(const float InterpValue)
 {
 	// 計算本次要移動到的位置
 	const FVector InterpLocation = BeforeLocation + OffsetLocation * InterpValue;
 	SetActorLocation(InterpLocation);
 }
 
-void ATacticalCombatMonitorPawn::MoveFinishedEvent()
+void ATactCombMonitorPawn::MoveFinishedEvent()
 {
 	bMoving = false;
 }
 
-void ATacticalCombatMonitorPawn::RotateYawInterpEvent(const float InterpValue)
+void ATactCombMonitorPawn::RotateYawInterpEvent(const float InterpValue)
 {
 	// 取得插值的旋轉位置
 	FRotator InterpRotator = GetActorRotation();
@@ -253,13 +253,13 @@ void ATacticalCombatMonitorPawn::RotateYawInterpEvent(const float InterpValue)
 	SetActorRotation(InterpRotator);
 }
 
-void ATacticalCombatMonitorPawn::RotateFinishedEvent()
+void ATactCombMonitorPawn::RotateFinishedEvent()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("RotateFinishedEvent"));
 	bRotating = false;
 }
 
-float ATacticalCombatMonitorPawn::GetScaleSpringArmLength(const float InZoomScale) const
+float ATactCombMonitorPawn::GetScaleSpringArmLength(const float InZoomScale) const
 {
 	if (InZoomScale <= 0.f)
 	{

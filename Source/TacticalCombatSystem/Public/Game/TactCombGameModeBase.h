@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "TacticalCombatGameModeBase.generated.h"
+#include "TactCombGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TACTICALCOMBATSYSTEM_API ATacticalCombatGameModeBase : public AGameModeBase
+class TACTICALCOMBATSYSTEM_API ATactCombGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
