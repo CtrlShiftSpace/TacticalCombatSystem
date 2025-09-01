@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class TACTICALCOMBATSYSTEM_API UViewportWidgetController : public UTactCombWidgetController
 {
 	GENERATED_BODY()
