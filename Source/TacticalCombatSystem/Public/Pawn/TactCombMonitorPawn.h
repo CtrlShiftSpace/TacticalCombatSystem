@@ -3,12 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Interaction/CameraInterface.h"
 #include "Interaction/MovementInterface.h"
 #include "TactCombMonitorPawn.generated.h"
 
+class UAttributeSet;
+class UAbilitySystemComponent;
 class UTimelineComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -26,7 +29,7 @@ struct FTactCombFloatTimelineEvent
 };
 
 UCLASS()
-class TACTICALCOMBATSYSTEM_API ATactCombMonitorPawn : public APawn, public ICameraInterface, public IMovementInterface
+class TACTICALCOMBATSYSTEM_API ATactCombMonitorPawn : public APawn, public IAbilitySystemInterface, public ICameraInterface, public IMovementInterface
 {
 	GENERATED_BODY()
 
@@ -62,6 +65,10 @@ public:
 
 	// 建立 Float Timeline 元件的工具函式
 	void AssignTactCombFloatTimelineComponent(UTimelineComponent& TactCombTimelineComponent, const FTactCombFloatTimelineEvent& TactCombFloatTimelineEvent);
+
+	// 覆寫介面的GetAbilitySystemComponent
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UAttributeSet* GetAttributeSet() const;
 	
 protected:
 
@@ -107,7 +114,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera Tools")
 	float ZoomScaleUnit = 0.5f;
 
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;
+	
 private:
+	
 	// 攝影機臂的預設長度
 	float DefaultSpringArmLength;
 
@@ -150,8 +164,7 @@ private:
 	 */
 	UFUNCTION()
 	void ZoomFinishedEvent();
-
-
+	
 	/**
 	 * Timeline 更新移動時的事件
 	 * 
@@ -205,4 +218,14 @@ private:
 
 	// 旋轉前後的差距 Yaw
 	float OffsetYaw;
+
+	/**
+	 * 初始化 AbilitySystemComponent 與 AttributeSet 資訊
+	 */
+	void InitialAbilityInfo();
+	
+	/**
+	 * 初始化 Viewport 介面
+	 */
+	void InitialViewport();
 };

@@ -2,9 +2,14 @@
 
 
 #include "Pawn/TactCombMonitorPawn.h"
+
+#include "AbilitySystem/TactCombAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/TactCombPlayerController.h"
+#include "Player/TactCombPlayerState.h"
+#include "UI/HUD/TactCombHUD.h"
 
 // Sets default values
 ATactCombMonitorPawn::ATactCombMonitorPawn()
@@ -77,7 +82,9 @@ void ATactCombMonitorPawn::BeginPlay()
 void ATactCombMonitorPawn::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	
+
+	// 建立 Viewport UI
+	InitialViewport();
 	UE_LOG(LogTemp, Warning, TEXT("ATactCombMonitorPawn::PossessedBy, NewController Name: %s"), *NewController->GetName());
 }
 
@@ -201,6 +208,16 @@ void ATactCombMonitorPawn::AssignTactCombFloatTimelineComponent(UTimelineCompone
 	TactCombTimelineComponent.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 }
 
+UAbilitySystemComponent* ATactCombMonitorPawn::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+UAttributeSet* ATactCombMonitorPawn::GetAttributeSet() const
+{
+	return AttributeSet;
+}
+
 float ATactCombMonitorPawn::GetZoomScale() const
 {
 	return ZoomScale;
@@ -257,6 +274,30 @@ void ATactCombMonitorPawn::RotateFinishedEvent()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("RotateFinishedEvent"));
 	bRotating = false;
+}
+
+void ATactCombMonitorPawn::InitialAbilityInfo()
+{
+	
+}
+
+void ATactCombMonitorPawn::InitialViewport()
+{
+	ATactCombPlayerState* TactCombPlayerState = GetPlayerState<ATactCombPlayerState>();
+	check(TactCombPlayerState);
+	AbilitySystemComponent = TactCombPlayerState->GetAbilitySystemComponent();
+	// Cast<UTactCombAbilitySystemComponent>(TactCombPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
+	// AbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
+	AttributeSet = TactCombPlayerState->GetAttributeSet();
+
+	// 執行HUD的InitOverlay
+	if (ATactCombPlayerController* TactCombPlayerController = Cast<ATactCombPlayerController>(GetController())) {
+		// 之所以加 if 是為了處理多人玩家中其他玩家會是nullptr而不用執行以下內容，
+		if (ATactCombHUD* TactCombHUD = Cast<ATactCombHUD>(TactCombPlayerController->GetHUD()))
+		{
+			TactCombHUD->InitViewport(TactCombPlayerController, TactCombPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
 
 float ATactCombMonitorPawn::GetScaleSpringArmLength(const float InZoomScale) const

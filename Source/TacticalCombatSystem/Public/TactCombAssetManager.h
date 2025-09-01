@@ -16,9 +16,9 @@ class TACTICALCOMBATSYSTEM_API UTactCombAssetManager : public UAssetManager
 
 public:
 	/**
-	 * 獲取 TacticalCombatAssetManager 的實例
+	 * 獲取 TactCombAssetManager 的實例
 	 * 
-	 * @return 返回 TacticalCombatAssetManager 的實例
+	 * @return 返回 TactCombAssetManager 的實例
 	 * @note 雖然 UAssetManager 也有定義 Get()，但由於是 static 方法，不會透過物件方式呼叫，因此不會互相影響也不會繼承
 	 */
 	static UTactCombAssetManager& Get();
