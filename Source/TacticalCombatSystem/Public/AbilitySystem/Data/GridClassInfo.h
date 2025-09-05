@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "GridClassInfo.generated.h"
 
@@ -21,8 +22,9 @@ struct FGridClassAssetInfo
 {
 	GENERATED_BODY()
 
+	// 網格形狀的 Tag
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UMaterialInstance> GridMaterial;
+	FGameplayTag GridShapeTag = FGameplayTag();
 };
 
 /**

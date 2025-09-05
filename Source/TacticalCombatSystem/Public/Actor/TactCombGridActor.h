@@ -18,6 +18,10 @@ public:
 	// Sets default values for this actor's properties
 	ATactCombGridActor();
 
+	// 取得識別網格形狀的 Gameplay Tag
+	UFUNCTION(BlueprintCallable, Category = "Grid Class Info")
+	FGameplayTag GetGridShapeTag() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,11 +30,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid Class Info")
 	EGridShape GridShape = EGridShape::Square;
 
-	// 網格類型資訊
-	UPROPERTY()
-	TObjectPtr<UGridClassInfo> GridClassInfo;
-
 	// 靜態物件
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> GridMesh;
+	
+private:
+
+	// 網格形狀的 Gameplay Tag
+	FGameplayTag GridShapeTag;
 };

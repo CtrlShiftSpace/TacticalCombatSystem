@@ -22,4 +22,22 @@ void FTactCombGameplayTags::InitializeNativeGameplayTags()
 		FName("InputTag.Zoom.Out"),
 		FString("Input Tag for Zooming Out")
 	);
+
+	// Grid Tag
+	
+	GameplayTags.Grid_Shape_Triangle = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Grid.Shape.Triangle"),
+		FString("Grid Tag for Triangle Shape")
+	);
+
+	GameplayTags.Grid_Shape_Square = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Grid.Shape.Square"),
+		FString("Grid Tag for Square Shape")
+	);
+
+	GameplayTags.Grid_Shape_Hexagon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Grid.Shape.Hexagon"),
+		FString("Grid Tag for Hexagon Shape")
+	);
+
 }

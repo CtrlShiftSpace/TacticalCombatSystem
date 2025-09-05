@@ -15,19 +15,21 @@ ATactCombGridActor::ATactCombGridActor()
 	GridMesh->SetupAttachment(RootComponent);
 }
 
+FGameplayTag ATactCombGridActor::GetGridShapeTag() const
+{
+	return GridShapeTag;
+}
+
 // Called when the game starts or when spawned
 void ATactCombGridActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// 取得目前設定的網格 Material
-	GridClassInfo = UTactCombAbilitySystemLibrary::GetGridClassInfo(this);
-	const FGridClassAssetInfo& GridClassAssetInfo = GridClassInfo->GetGridClassAssetInfo(GridShape);
-
-	// 如果 Mesh 存在才設定網格素材
-	if (GridMesh->GetStaticMesh() != nullptr && GridMesh->GetNumMaterials() > 0)
+	
+	if (const UGridClassInfo* GridClassInfo = UTactCombAbilitySystemLibrary::GetGridClassInfo(this))
 	{
-		GridMesh->SetMaterial(0, GridClassAssetInfo.GridMaterial);
+		// 設定網格形狀的 Gameplay Tag
+		GridShapeTag = GridClassInfo->GetGridClassAssetInfo(GridShape).GridShapeTag;
 	}
+	
 }
 

@@ -41,6 +41,13 @@ public:
 	// 縮小
 	FGameplayTag InputTag_Zoom_Out;
 
+	/*
+	 * Grid Tags
+	 */
+	FGameplayTag Grid_Shape_Triangle;
+	FGameplayTag Grid_Shape_Square;
+	FGameplayTag Grid_Shape_Hexagon;
+
 private:
 	// 使用 static 關鍵字來定義靜態實例，確保只有一個實例存在
 	static FTactCombGameplayTags GameplayTags;
