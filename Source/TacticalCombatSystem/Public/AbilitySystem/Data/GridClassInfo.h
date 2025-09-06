@@ -11,6 +11,7 @@
 UENUM(BlueprintType)
 enum class EGridShape : uint8
 {
+	None,
 	Triangle,
 	Square,
 	Hexagon
@@ -25,6 +26,31 @@ struct FGridClassAssetInfo
 	// 網格形狀的 Tag
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTag GridShapeTag = FGameplayTag();
+
+	// 網格大小
+	UPROPERTY(EditDefaultsOnly)
+	FVector MeshSize = FVector::ZeroVector;
+
+	// 網格 Mesh 模型
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UStaticMesh> GridMesh = nullptr;
+
+	// 套用到網格 Mesh 的素材
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UMaterialInstance> GridMeshMaterial = nullptr;
+
+	// 單一平面的網格 Mesh 模型
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UStaticMesh> GridFlatMesh = nullptr;
+
+	// 單一平面外框的素材
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UMaterialInstance> GridFlatBorderMaterial = nullptr;
+
+	// 單一平面填充的素材
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UMaterialInstance> GridFlatFilledMaterial = nullptr;
+
 };
 
 /**

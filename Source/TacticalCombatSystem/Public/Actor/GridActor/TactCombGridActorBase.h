@@ -5,18 +5,17 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Data/GridClassInfo.h"
 #include "GameFramework/Actor.h"
-#include "TactCombGridActor.generated.h"
+#include "TactCombGridActorBase.generated.h"
 
 enum class EGridShape : uint8;
 
-UCLASS()
-class TACTICALCOMBATSYSTEM_API ATactCombGridActor : public AActor
+UCLASS(Abstract)
+class TACTICALCOMBATSYSTEM_API ATactCombGridActorBase : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	ATactCombGridActor();
+public:
+	ATactCombGridActorBase();
 
 	// 取得識別網格形狀的 Gameplay Tag
 	UFUNCTION(BlueprintCallable, Category = "Grid Class Info")
@@ -30,12 +29,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid Class Info")
 	EGridShape GridShape = EGridShape::Square;
 
-	// 靜態物件
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UStaticMeshComponent> GridMesh;
+	// 網格形狀的 Gameplay Tag
+	FGameplayTag GridShapeTag;
 	
 private:
 
-	// 網格形狀的 Gameplay Tag
-	FGameplayTag GridShapeTag;
+	
 };

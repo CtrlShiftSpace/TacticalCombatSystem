@@ -1,27 +1,21 @@
 // Copyright  CtrlShiftSpace
 
 
-#include "Actor/TactCombGridActor.h"
+#include "Actor/GridActor/TactCombGridActorBase.h"
 #include "AbilitySystem/TactCombAbilitySystemLibrary.h"
 
-// Sets default values
-ATactCombGridActor::ATactCombGridActor()
+ATactCombGridActorBase::ATactCombGridActorBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
-	// 建立靜態網格元件
-	GridMesh = CreateDefaultSubobject<UStaticMeshComponent>("GridMesh");
-	GridMesh->SetupAttachment(RootComponent);
 }
 
-FGameplayTag ATactCombGridActor::GetGridShapeTag() const
+FGameplayTag ATactCombGridActorBase::GetGridShapeTag() const
 {
 	return GridShapeTag;
 }
 
 // Called when the game starts or when spawned
-void ATactCombGridActor::BeginPlay()
+void ATactCombGridActorBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
@@ -30,6 +24,5 @@ void ATactCombGridActor::BeginPlay()
 		// 設定網格形狀的 Gameplay Tag
 		GridShapeTag = GridClassInfo->GetGridClassAssetInfo(GridShape).GridShapeTag;
 	}
-	
 }
 
