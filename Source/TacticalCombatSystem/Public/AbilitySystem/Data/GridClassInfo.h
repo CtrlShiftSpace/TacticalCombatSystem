@@ -56,7 +56,7 @@ struct FGridClassAssetInfo
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class TACTICALCOMBATSYSTEM_API UGridClassInfo : public UDataAsset
 {
 	GENERATED_BODY()

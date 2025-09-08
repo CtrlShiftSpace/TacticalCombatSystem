@@ -18,7 +18,7 @@ struct FGridInstanceParam
 
 	// 網格大小
 	UPROPERTY(EditDefaultsOnly)
-	FVector GridSize = FVector(100.f, 100.f, 1.f);
+	FVector GridSize = FVector(100.f, 100.f, 100.f);
 	
 	// 長邊的網格數量
 	UPROPERTY(EditDefaultsOnly)
@@ -46,13 +46,13 @@ protected:
 	
 	// 產生網格 Instance
 	UFUNCTION(BlueprintCallable, Category = "GridInst Process")
-	void SpawnGridInstance(const FGridInstanceParam& InGridInstParam);
+	void SpawnGridInstance(const FGridInstanceParam& InGridInstParam, const UGridClassInfo* GridClassInfo);
 	
 	// 靜態 Instance 物件
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UInstancedStaticMeshComponent> GridInstMesh;
 
-	UPROPERTY(EditDefaultsOnly, Category = "GridInst Settings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GridInst Settings")
 	FGridInstanceParam GridInstParam;
 	
 };
