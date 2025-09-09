@@ -28,7 +28,13 @@ void ATactCombGridInstActor::SpawnGridInstance(const FGridInstanceParam& InGridI
 	// 計算網格的縮放比例
 	const FVector GridScale = InGridInstParam.GridSize / GridAssetInfo.MeshSize * 2.f;
 	// 計算網格平面大小
-	const FVector2D GridPlaneSize = FVector2D(InGridInstParam.GridSize.X, InGridInstParam.GridSize.Y);
+	FVector2D GridPlaneSize = FVector2D(InGridInstParam.GridSize.X, InGridInstParam.GridSize.Y);
+	if (GridShape == EGridShape::Triangle)
+	{
+		// 三角形的 Y 軸長度較短需要除以 2
+		GridPlaneSize.Y *= 0.5f;
+	}
+
 	// 計算網格總大小的一半
 	const FVector2D HalfGridSizeXY = FVector2D(InGridInstParam.WidthGridNum - 1, InGridInstParam.LengthGridNum - 1) * 0.5f * GridPlaneSize;
 	// 計算左下角的座標
@@ -45,9 +51,21 @@ void ATactCombGridInstActor::SpawnGridInstance(const FGridInstanceParam& InGridI
 	{
 		for (int32 Y = 0; Y < InGridInstParam.LengthGridNum; ++Y)
 		{
-			const FVector InstanceLocation = LeftBottomCornerLocation + FVector(InGridInstParam.GridSize.X * X, InGridInstParam.GridSize.Y * Y, 0.f);
+			FRotator InstanceRotator = FRotator::ZeroRotator;
+			// 三角形的判斷
+			if (GridShape == EGridShape::Triangle)
+			{
+				bool bXOdd = (FMath::Modulo(X, 2) == 1);
+                bool bYOdd = (FMath::Modulo(Y, 2) == 1);
+				// 只有 X 與 Y 其中一個是奇數，才旋轉 180 度
+				if (bXOdd != bYOdd)
+				{
+					InstanceRotator = FRotator(0.f, 180.f, 0.f);
+				}
+			}
+			const FVector InstanceLocation = LeftBottomCornerLocation + FVector(GridPlaneSize.X * X, GridPlaneSize.Y * Y, 0.f);
 			const FTransform InstanceTransform = FTransform(
-				FRotator::ZeroRotator,
+				InstanceRotator,
 				InstanceLocation,
 				GridScale
 			);
