@@ -13,19 +13,19 @@ struct FGridInstanceParam
 	GENERATED_BODY()
 
 	// 網格的中心位置
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector CenterLocation = FVector::ZeroVector;
 
 	// 網格大小
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector GridSize = FVector(100.f, 100.f, 100.f);
 	
 	// 長邊的網格數量
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 LengthGridNum = 5;
 
 	// 寬邊的網格數量
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 WidthGridNum = 4;
 	
 };

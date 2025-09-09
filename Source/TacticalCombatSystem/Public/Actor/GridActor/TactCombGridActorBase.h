@@ -21,6 +21,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid Class Info")
 	FGameplayTag GetGridShapeTag() const;
 
+	// 計算傳入位置對齊到網格後的位置
+	UFUNCTION(BlueprintCallable, Category = "Grid Process")
+	FVector GetSnapGridPosition(const FVector& InLocation, const FVector& GridSize, const FVector& GridOffset = FVector::ZeroVector) const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

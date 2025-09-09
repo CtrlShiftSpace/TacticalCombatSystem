@@ -14,6 +14,15 @@ FGameplayTag ATactCombGridActorBase::GetGridShapeTag() const
 	return GridShapeTag;
 }
 
+FVector ATactCombGridActorBase::GetSnapGridPosition(const FVector& InLocation, const FVector& GridSize, const FVector& GridOffset) const
+{
+	return FVector(
+			FMath::GridSnap(InLocation.X, GridSize.X),
+			FMath::GridSnap(InLocation.Y, GridSize.Y),
+			FMath::GridSnap(InLocation.Z, GridSize.Z)
+			) + GridOffset;
+}
+
 // Called when the game starts or when spawned
 void ATactCombGridActorBase::BeginPlay()
 {
