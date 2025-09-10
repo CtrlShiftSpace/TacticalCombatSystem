@@ -5,7 +5,6 @@
 
 #include "AbilitySystem/TactCombAbilitySystemLibrary.h"
 #include "Components/InstancedStaticMeshComponent.h"
-#include "Math/TransformCalculus3D.h"
 
 ATactCombGridInstActor::ATactCombGridInstActor()
 {
@@ -17,28 +16,21 @@ ATactCombGridInstActor::ATactCombGridInstActor()
 void ATactCombGridInstActor::BeginPlay()
 {
 	Super::BeginPlay();
+	// 更新網格左下角位置
+	GridInstParam.LeftBottomCornerLocation = GetLeftBottomCornerLocation();
 	const UGridClassInfo* GridClassInfo =  UTactCombAbilitySystemLibrary::GetGridClassInfo(this);
-	SpawnGridInstance(GridInstParam, GridClassInfo);
+	SpawnGridInstance(GridClassInfo);
 }
 
-void ATactCombGridInstActor::SpawnGridInstance(const FGridInstanceParam& InGridInstParam, const UGridClassInfo* GridClassInfo)
+void ATactCombGridInstActor::SpawnGridInstance(const UGridClassInfo* GridClassInfo)
 {
 	// 依照設定的形狀取得網格的素材
 	const FGridClassAssetInfo& GridAssetInfo = GridClassInfo->GetGridClassAssetInfo(GridShape);
 	// 計算網格的縮放比例
-	const FVector GridScale = InGridInstParam.GridSize / GridAssetInfo.MeshSize * 2.f;
-	// 計算網格平面大小
-	FVector2D GridPlaneSize = FVector2D(InGridInstParam.GridSize.X, InGridInstParam.GridSize.Y);
-	if (GridShape == EGridShape::Triangle)
-	{
-		// 三角形的 Y 軸長度較短需要除以 2
-		GridPlaneSize.Y *= 0.5f;
-	}
-
-	// 計算網格總大小的一半
-	const FVector2D HalfGridSizeXY = FVector2D(InGridInstParam.WidthGridNum - 1, InGridInstParam.LengthGridNum - 1) * 0.5f * GridPlaneSize;
-	// 計算左下角的座標
-	const FVector LeftBottomCornerLocation = InGridInstParam.CenterLocation - FVector(HalfGridSizeXY.X, HalfGridSizeXY.Y, 0.f);
+	const FVector GridScale = GetGridScale(GridClassInfo);
+	const FVector2D GridPlaneSize = GetGridPlaneSize();
+	// 取得網格平面左下角的座標位置
+	const FVector& LeftBottomCornerLocation = GridInstParam.LeftBottomCornerLocation;
 	// 移除現有的 Instance 資訊
 	GridInstMesh->ClearInstances();
 	// 使用 Border 的 Mesh
@@ -47,9 +39,9 @@ void ATactCombGridInstActor::SpawnGridInstance(const FGridInstanceParam& InGridI
 	GridInstMesh->SetMaterial(0, GridAssetInfo.GridFlatBorderMaterial);
 	
 	// 從左下位置依序建立網格
-	for (int32 X = 0; X < InGridInstParam.WidthGridNum; ++X)
+	for (int32 X = 0; X < GridInstParam.LengthGridNum; ++X)
 	{
-		for (int32 Y = 0; Y < InGridInstParam.LengthGridNum; ++Y)
+		for (int32 Y = 0; Y < GridInstParam.WidthGridNum; ++Y)
 		{
 			FRotator InstanceRotator = FRotator::ZeroRotator;
 			// 三角形的判斷
@@ -72,4 +64,32 @@ void ATactCombGridInstActor::SpawnGridInstance(const FGridInstanceParam& InGridI
 			GridInstMesh->AddInstance(InstanceTransform);
 		}
 	}
+}
+
+FVector2D ATactCombGridInstActor::GetGridPlaneSize() const
+{
+	// 計算網格平面大小，只取XY值
+	FVector2D GridPlaneSize = FVector2D(GridInstParam.GridSize);
+	if (GridShape == EGridShape::Triangle)
+	{
+		// 三角形的 Y 軸長度較短需要除以 2
+		GridPlaneSize.Y *= 0.5f;
+	}
+	return GridPlaneSize;
+}
+
+FVector2D ATactCombGridInstActor::GetHalfPlaneSize() const
+{
+	const FVector2D GridPlaneSize = GetGridPlaneSize();
+	// 計算網格平面大小的一半
+	return FVector2D(
+		GridInstParam.LengthGridNum - 1 > 0 ? GridInstParam.LengthGridNum - 1 : 0,
+		GridInstParam.WidthGridNum - 1 > 0 ? GridInstParam.WidthGridNum - 1 : 0
+		) * 0.5f * GridPlaneSize;
+}
+
+FVector ATactCombGridInstActor::GetLeftBottomCornerLocation() const
+{
+	const FVector2D HalfGridPlaneSize = GetHalfPlaneSize();
+	return GridInstParam.CenterLocation - FVector(HalfGridPlaneSize.X, HalfGridPlaneSize.Y, 0.f);
 }

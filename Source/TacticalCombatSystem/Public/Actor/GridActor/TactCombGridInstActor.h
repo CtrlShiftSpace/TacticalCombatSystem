@@ -16,6 +16,10 @@ struct FGridInstanceParam
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector CenterLocation = FVector::ZeroVector;
 
+	// 網格的左下角位置
+	UPROPERTY()
+	FVector LeftBottomCornerLocation = FVector::ZeroVector;
+
 	// 網格大小
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector GridSize = FVector(100.f, 100.f, 100.f);
@@ -46,8 +50,17 @@ protected:
 	
 	// 產生網格 Instance
 	UFUNCTION(BlueprintCallable, Category = "GridInst Process")
-	void SpawnGridInstance(const FGridInstanceParam& InGridInstParam, const UGridClassInfo* GridClassInfo);
-	
+	void SpawnGridInstance(const UGridClassInfo* GridClassInfo);
+
+	// 取得網格平面大小
+	FVector2D GetGridPlaneSize() const;
+
+	// 取得網格平面大小的一半
+	FVector2D GetHalfPlaneSize() const;
+
+	// 取得網格平面左下角的座標位置
+	FVector GetLeftBottomCornerLocation() const;
+		
 	// 靜態 Instance 物件
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UInstancedStaticMeshComponent> GridInstMesh;

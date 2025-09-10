@@ -35,6 +35,9 @@ protected:
 
 	// 網格形狀的 Gameplay Tag
 	FGameplayTag GridShapeTag;
+
+	// 取得網格對應素材的縮放比例
+	FVector GetGridScale(const UGridClassInfo* GridClassInfo) const;
 	
 private:
 

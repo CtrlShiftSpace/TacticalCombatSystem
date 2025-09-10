@@ -62,7 +62,7 @@ class TACTICALCOMBATSYSTEM_API UGridClassInfo : public UDataAsset
 	GENERATED_BODY()
 
 public:
-
+	
 	// 根據網格形狀取得對應的素材資訊
 	FGridClassAssetInfo GetGridClassAssetInfo(EGridShape GridShape) const;
 
