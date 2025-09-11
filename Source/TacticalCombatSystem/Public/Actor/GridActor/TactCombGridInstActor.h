@@ -52,11 +52,11 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "GridInst Process")
 	void SpawnGridInstance(const UGridClassInfo* GridClassInfo);
 
+	// 取得單一網格大小
+	FVector2D GetGridTileSize() const;
+
 	// 取得網格平面大小
 	FVector2D GetGridPlaneSize() const;
-
-	// 取得網格平面大小的一半
-	FVector2D GetHalfPlaneSize() const;
 
 	// 取得網格平面左下角的座標位置
 	FVector GetLeftBottomCornerLocation() const;
