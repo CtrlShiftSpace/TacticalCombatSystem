@@ -6,31 +6,17 @@
 #include "Actor/GridActor/TactCombGridActorBase.h"
 #include "TactCombGridInstActor.generated.h"
 
-// 網格 Instance 參數設定
+class UBoxComponent;
+
 USTRUCT(BlueprintType)
-struct FGridInstanceParam
+struct FGridInstanceTile
 {
 	GENERATED_BODY()
 
-	// 網格的中心位置
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FVector CenterLocation = FVector::ZeroVector;
-
-	// 網格的左下角位置
+	// 網格位置
 	UPROPERTY()
-	FVector LeftBottomCornerLocation = FVector::ZeroVector;
+	FTransform TileTransform = FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector);
 
-	// 網格大小
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FVector GridSize = FVector(100.f, 100.f, 100.f);
-	
-	// 長邊的網格數量
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 LengthGridNum = 5;
-
-	// 寬邊的網格數量
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 WidthGridNum = 4;
 	
 };
 
@@ -44,6 +30,10 @@ class TACTICALCOMBATSYSTEM_API ATactCombGridInstActor : public ATactCombGridActo
 	
 public:
 	ATactCombGridInstActor();
+
+	// 取得網格 Instance Tile
+	UFUNCTION()
+	TArray<FGridInstanceTile> GetGridInstTiles(const UGridClassInfo* GridClassInfo);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -65,7 +55,32 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UInstancedStaticMeshComponent> GridInstMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GridInst Settings")
-	FGridInstanceParam GridInstParam;
+	// 網格大小
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector GridSize = FVector(100.f, 100.f, 100.f);
 	
+	// 長邊的網格數量
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 LengthGridNum = 5;
+
+	// 寬邊的網格數量
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 WidthGridNum = 4;
+
+private:
+	// 網格 Instance 的自訂偏移向量，用於浮在地面上，避免同樣高度的物件 Z-Fighting
+	UPROPERTY()
+	FVector TileOffsetVector = FVector(0.f, 0.f, 2.f);
+
+	// 紀錄每個網格 Instance 的資料
+	UPROPERTY()
+	TArray<FGridInstanceTile> GridInstTiles;
+
+	// 網格的中心位置
+	UPROPERTY()
+	FVector CenterLocation = FVector::ZeroVector;
+
+	// 網格的左下角位置
+	UPROPERTY()
+	FVector LeftBottomCornerLocation = FVector::ZeroVector;
 };
