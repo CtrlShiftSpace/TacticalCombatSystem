@@ -8,6 +8,15 @@
 
 class UBoxComponent;
 
+// 網格類型
+UENUM()
+enum class EGridTileType : uint8
+{
+	None,
+	Accessible,
+	Obstacle
+};
+
 USTRUCT(BlueprintType)
 struct FGridInstanceTile
 {
@@ -17,6 +26,9 @@ struct FGridInstanceTile
 	UPROPERTY()
 	FTransform TileTransform = FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector);
 
+	// 網格類型
+	UPROPERTY()
+	EGridTileType TileType = EGridTileType::None;
 	
 };
 
@@ -34,6 +46,9 @@ public:
 	// 取得網格 Instance Tile
 	UFUNCTION()
 	TArray<FGridInstanceTile> GetGridInstTiles(const UGridClassInfo* GridClassInfo);
+
+	// 偵測地面資訊
+	void DetectGroundInfo(FGridInstanceTile& Tile) const;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -66,6 +81,17 @@ protected:
 	// 寬邊的網格數量
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 WidthGridNum = 4;
+
+	// 偵測地面的最大高度
+	UPROPERTY(EditAnywhere)
+	float MaxDetectHeight = 500.f;
+
+	// 偵測地面的最小高度
+	UPROPERTY(EditAnywhere)
+	float MinDetectHeight = -500.f;
+
+	UPROPERTY()
+	TArray<AActor*> ActorsToIgnore;
 
 private:
 	// 網格 Instance 的自訂偏移向量，用於浮在地面上，避免同樣高度的物件 Z-Fighting

@@ -5,12 +5,18 @@
 
 #include "AbilitySystem/TactCombAbilitySystemLibrary.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ATactCombGridInstActor::ATactCombGridInstActor()
 {
 	// 建立靜態網格元件
 	GridInstMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>("GridInstMesh");
 	GridInstMesh->SetupAttachment(RootComponent);
+	if (MaxDetectHeight < MinDetectHeight)
+	{
+		// 確保最大偵測高度大於最小偵測高度
+		MaxDetectHeight = MinDetectHeight;
+	}
 }
 
 TArray<FGridInstanceTile> ATactCombGridInstActor::GetGridInstTiles(const UGridClassInfo* GridClassInfo)
@@ -61,22 +67,63 @@ TArray<FGridInstanceTile> ATactCombGridInstActor::GetGridInstTiles(const UGridCl
 				InstanceLocation,
 				GridScale
 			);
+			// 偵測地面資訊
+			DetectGroundInfo(GridInstTile);
 			GridInstTilesRecord.Add(GridInstTile);
 		}
 	}
 	return GridInstTilesRecord;
 }
 
+void ATactCombGridInstActor::DetectGroundInfo(FGridInstanceTile& Tile) const
+{
+	const FVector& TileLocation = Tile.TileTransform.GetLocation();
+	const FVector TileWorldLocation = GetActorTransform().TransformPosition(TileLocation);
+	
+	// 偵測線段的起點與終點
+	const FVector DetectGroundStart = TileLocation + FVector(0.f, 0.f, MaxDetectHeight);
+	const FVector DetectGroundEnd = TileLocation + FVector(0.f, 0.f, MinDetectHeight);
+
+	// 將偵測線段轉換到世界座標
+	const FVector DetectGroundInWorldStart = GetActorTransform().TransformPosition(DetectGroundStart);
+	const FVector DetectGroundInWorldEnd = GetActorTransform().TransformPosition(DetectGroundEnd);
+
+	// 偵測結果
+	FHitResult HitResult;
+	const bool bDetectGround = UKismetSystemLibrary::LineTraceSingle(this,
+									DetectGroundInWorldStart,
+									DetectGroundInWorldEnd,
+									UEngineTypes::ConvertToTraceType(ECC_Visibility),
+									false,
+									ActorsToIgnore,
+									EDrawDebugTrace::None,
+									HitResult,
+									true);
+	
+	if (bDetectGround)
+	{
+		// 如果有偵測到地面，將地面位置加上偏移量作為更新後的網格位置
+		FVector GroundTileLocation = RootComponent->GetComponentTransform().InverseTransformPosition(HitResult.Location) + TileOffsetVector;
+		Tile.TileTransform.SetLocation(GroundTileLocation);
+		Tile.TileType = EGridTileType::Accessible;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Ground Location: %s"), *HitResult.ImpactPoint.ToString()));
+	}
+}
+
 void ATactCombGridInstActor::BeginPlay()
 {
 	Super::BeginPlay();
-	// 更新網格左下角位置
 	const UGridClassInfo* GridClassInfo =  UTactCombAbilitySystemLibrary::GetGridClassInfo(this);
+	// 將 Actor 位置對齊到格線上
+	const FVector GridLocation = GetSnapGridPosition(RootComponent->GetComponentLocation(), GridSize, FVector::ZeroVector);
+	// UE_LOG(LogTemp, Log, TEXT("GridLocation: %s"), *GridLocation.ToString());
+	RootComponent->SetWorldLocation(GridLocation);
 	SpawnGridInstance(GridClassInfo);
 }
 
 void ATactCombGridInstActor::SpawnGridInstance(const UGridClassInfo* GridClassInfo)
 {
+
 	// 依照設定的形狀取得網格的素材
 	const FGridClassAssetInfo& GridAssetInfo = GridClassInfo->GetGridClassAssetInfo(GridShape);
 	// 移除現有的 Instance 資訊
@@ -99,23 +146,6 @@ void ATactCombGridInstActor::SpawnGridInstance(const UGridClassInfo* GridClassIn
 	{
 		GridInstMesh->AddInstance(GridInstTile.TileTransform);
 	}
-
-	// // 測試偵測線段
-	// FVector DetectGroundStart = InstanceLocation + FVector(0.f, 0.f, 500.f);
-	// FVector DetectGroundEnd = InstanceLocation + FVector(0.f, 0.f, -500.f);
-	// // 轉換到世界座標
-	// FVector DetectGroundInWorldStart = GetActorTransform().TransformPosition(DetectGroundStart);
-	// FVector DetectGroundInWorldEnd = GetActorTransform().TransformPosition(DetectGroundEnd);
-	// 		
-	// const TArray<AActor*>& ActorsToIgnore = TArray<AActor*>();
-	// FHitResult HitResult;
-	// const bool bDetectGround = UKismetSystemLibrary::LineTraceSingle(this, DetectGroundInWorldStart, DetectGroundInWorldEnd, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true);
-	// if (bDetectGround)
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Ground Location: %s"), *HitResult.ImpactPoint.ToString()));
-	// }
-	// 		
-	// DrawDebugLine(GetWorld(), DetectGroundInWorldStart, DetectGroundInWorldEnd, FColor::Green, true, -1.f, 0, 5.f);
 }
 
 FVector2D ATactCombGridInstActor::GetGridTileSize() const
