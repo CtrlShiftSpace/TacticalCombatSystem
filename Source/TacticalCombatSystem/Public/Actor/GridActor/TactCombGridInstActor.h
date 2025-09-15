@@ -8,15 +8,6 @@
 
 class UBoxComponent;
 
-// 網格類型
-UENUM()
-enum class EGridTileType : uint8
-{
-	None,
-	Accessible,
-	Obstacle
-};
-
 USTRUCT(BlueprintType)
 struct FGridInstanceTile
 {

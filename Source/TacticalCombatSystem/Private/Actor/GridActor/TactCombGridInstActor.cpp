@@ -144,6 +144,11 @@ void ATactCombGridInstActor::SpawnGridInstance(const UGridClassInfo* GridClassIn
 	// 依序加入 Instance
 	for (const FGridInstanceTile& GridInstTile : GridInstTiles)
 	{
+		if (GridInstTile.TileType == EGridTileType::None)
+		{
+			// 如果沒有偵測到地面就不生成這個格子
+			continue;
+		}
 		GridInstMesh->AddInstance(GridInstTile.TileTransform);
 	}
 }

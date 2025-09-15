@@ -9,6 +9,15 @@
 
 enum class EGridShape : uint8;
 
+// 網格類型
+UENUM()
+enum class EGridTileType : uint8
+{
+	None,
+	Accessible,
+	Obstacle
+};
+
 UCLASS(Abstract)
 class TACTICALCOMBATSYSTEM_API ATactCombGridActorBase : public AActor
 {
