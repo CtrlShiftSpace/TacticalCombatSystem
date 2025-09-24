@@ -25,6 +25,8 @@ class TACTICALCOMBATSYSTEM_API ATactCombPlayerController : public APlayerControl
 public:
 	// 建構式
 	ATactCombPlayerController();
+	virtual void PlayerTick(float DeltaTime);
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -64,6 +66,11 @@ private:
 
 	// 旋轉角度
 	float RotatorYawAngle = 45.f;
-	
+
+	// 追蹤滑鼠資訊
+	void TraceMouse();
+
+	// 追蹤所偵測的物件
+	FHitResult TraceMouseHit;
 	
 };

@@ -41,6 +41,9 @@ public:
 	// 偵測地面資訊
 	void DetectGroundInfo(FGridInstanceTile& Tile) const;
 	
+	virtual FVector GetGridPivotLocation_Implementation() const override;
+	virtual FVector GetNearestPivotByLocation_Implementation(const FVector& InLocation) const override;
+	
 protected:
 	virtual void BeginPlay() override;
 	
@@ -83,6 +86,9 @@ protected:
 
 	UPROPERTY()
 	TArray<AActor*> ActorsToIgnore;
+
+	// 透過位置取得所在網格索引值
+	int32 GetTileIndexFromLocation(const FVector& InLocation) const;
 
 private:
 	// 網格 Instance 的自訂偏移向量，用於浮在地面上，避免同樣高度的物件 Z-Fighting

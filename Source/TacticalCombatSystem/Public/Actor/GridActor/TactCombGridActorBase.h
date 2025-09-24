@@ -5,21 +5,13 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Data/GridClassInfo.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/GridInterface.h"
 #include "TactCombGridActorBase.generated.h"
 
 enum class EGridShape : uint8;
 
-// 網格類型
-UENUM()
-enum class EGridTileType : uint8
-{
-	None,
-	Accessible,
-	Obstacle
-};
-
 UCLASS(Abstract)
-class TACTICALCOMBATSYSTEM_API ATactCombGridActorBase : public AActor
+class TACTICALCOMBATSYSTEM_API ATactCombGridActorBase : public AActor, public IGridInterface
 {
 	GENERATED_BODY()
 	
@@ -34,6 +26,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid Process")
 	FVector GetSnapGridPosition(const FVector& InLocation, const FVector& GridSize, const FVector& GridOffset = FVector::ZeroVector) const;
 
+	/* 覆寫 GridInterface 介面 */
+	virtual EGridTileType GetGridTileType_Implementation() const override;
+	virtual FVector GetGridPivotLocation_Implementation() const override;
+	virtual FVector GetNearestPivotByLocation_Implementation(const FVector& InLocation) const override;
+	/* 覆寫 GridInterface 介面 End */
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -47,6 +45,10 @@ protected:
 
 	// 取得網格對應素材的縮放比例
 	FVector GetGridScale(const UGridClassInfo* GridClassInfo) const;
+
+	// 網格類型(包含是否可行走、被阻擋)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Grid Class Info")
+	EGridTileType GridTileType = EGridTileType::None;
 	
 private:
 

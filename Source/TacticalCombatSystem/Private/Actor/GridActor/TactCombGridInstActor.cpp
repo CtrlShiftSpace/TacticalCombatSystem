@@ -4,6 +4,7 @@
 #include "Actor/GridActor/TactCombGridInstActor.h"
 
 #include "AbilitySystem/TactCombAbilitySystemLibrary.h"
+#include "Actor/GridActor/TactCombGridObstacle.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -105,9 +106,29 @@ void ATactCombGridInstActor::DetectGroundInfo(FGridInstanceTile& Tile) const
 		// 如果有偵測到地面，將地面位置加上偏移量作為更新後的網格位置
 		FVector GroundTileLocation = RootComponent->GetComponentTransform().InverseTransformPosition(HitResult.Location) + TileOffsetVector;
 		Tile.TileTransform.SetLocation(GroundTileLocation);
-		Tile.TileType = EGridTileType::Accessible;
+		// 檢查是否接觸到實作 GridInterface 介面物件
+		if (HitResult.GetActor()->Implements<UGridInterface>())
+		{
+			// 取得網格類型
+			Tile.TileType = IGridInterface::Execute_GetGridTileType(HitResult.GetActor());
+		}
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Ground Location: %s"), *HitResult.ImpactPoint.ToString()));
 	}
+}
+
+FVector ATactCombGridInstActor::GetGridPivotLocation_Implementation() const
+{
+	return CenterLocation;
+}
+
+FVector ATactCombGridInstActor::GetNearestPivotByLocation_Implementation(const FVector& InLocation) const
+{
+	int32 TileIndex = GetTileIndexFromLocation(InLocation);
+	if (GridInstTiles.IsValidIndex(TileIndex))
+	{
+		return GridInstTiles[TileIndex].TileTransform.GetLocation();
+	}
+	return FVector::ZeroVector;
 }
 
 void ATactCombGridInstActor::BeginPlay()
@@ -144,12 +165,11 @@ void ATactCombGridInstActor::SpawnGridInstance(const UGridClassInfo* GridClassIn
 	// 依序加入 Instance
 	for (const FGridInstanceTile& GridInstTile : GridInstTiles)
 	{
-		if (GridInstTile.TileType == EGridTileType::None)
+		if (GridInstTile.TileType == EGridTileType::Accessible)
 		{
-			// 如果沒有偵測到地面就不生成這個格子
-			continue;
+			// 只有可到達位置才生成格子
+			GridInstMesh->AddInstance(GridInstTile.TileTransform);
 		}
-		GridInstMesh->AddInstance(GridInstTile.TileTransform);
 	}
 }
 
@@ -182,4 +202,11 @@ FVector ATactCombGridInstActor::GetLeftBottomCornerLocation() const
 		WidthGridNum - 1 > 0 ? (GetGridTileSize().Y * (WidthGridNum - 1)) : 0.f
 	) * 0.5f;
 	return CenterLocation - FVector(HalfGridPlaneSize.X, HalfGridPlaneSize.Y, 0.f);
+}
+
+int32 ATactCombGridInstActor::GetTileIndexFromLocation(const FVector& InLocation) const
+{
+	// TODO: 取得所在格子索引值
+	
+	return 0;
 }

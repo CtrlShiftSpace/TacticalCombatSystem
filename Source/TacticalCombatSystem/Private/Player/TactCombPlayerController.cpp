@@ -8,11 +8,20 @@
 #include "TactCombGameplayTags.h"
 #include "Input/TactCombEnhInputComponent.h"
 #include "Interaction/CameraInterface.h"
+#include "Interaction/GridInterface.h"
 #include "Interaction/MovementInterface.h"
+#include "TacticalCombatSystem/TacticalCombatSystem.h"
 
 ATactCombPlayerController::ATactCombPlayerController()
 {
 	bReplicates = true;
+}
+
+void ATactCombPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+	// 每一幀都檢測滑鼠游標位置
+	TraceMouse();
 }
 
 void ATactCombPlayerController::BeginPlay()
@@ -111,4 +120,23 @@ void ATactCombPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void ATactCombPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+}
+
+void ATactCombPlayerController::TraceMouse()
+{
+	// 取得滑鼠游標在畫面中檢測到的結果
+	GetHitResultUnderCursor(ECC_Interact, false, TraceMouseHit);
+	if (!TraceMouseHit.bBlockingHit)
+	{
+		return;
+	}
+	
+	if (TraceMouseHit.GetActor()->Implements<UGridInterface>())
+	{
+		// TODO: 檢測是否檢測到網格
+		
+		// 顯示球體顯示游標位置
+		DrawDebugSphere(GetWorld(), TraceMouseHit.Location, 20.f, 12, FColor::Yellow, false, 0.1f, 0, 2.f);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Actor: %s"), *TraceMouseHit.GetActor()->GetName()));
+	}
 }

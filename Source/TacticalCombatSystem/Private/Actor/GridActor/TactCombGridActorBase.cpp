@@ -23,6 +23,21 @@ FVector ATactCombGridActorBase::GetSnapGridPosition(const FVector& InLocation, c
 			) + GridOffset;
 }
 
+EGridTileType ATactCombGridActorBase::GetGridTileType_Implementation() const
+{
+	return GridTileType;
+}
+
+FVector ATactCombGridActorBase::GetGridPivotLocation_Implementation() const
+{
+	return GetActorLocation();
+}
+
+FVector ATactCombGridActorBase::GetNearestPivotByLocation_Implementation(const FVector& InLocation) const
+{
+	return GetActorLocation();
+}
+
 // Called when the game starts or when spawned
 void ATactCombGridActorBase::BeginPlay()
 {
