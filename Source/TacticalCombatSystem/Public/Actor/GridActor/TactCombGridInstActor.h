@@ -43,6 +43,8 @@ public:
 
 	/* 繼承 TactCombGridActorBase */
 	virtual FVector GetPivotByIndex_Implementation(int32 Index) const override;
+	virtual void HighlightByIndex(const int32& Index) override;
+	virtual void UnHighlightByIndex(const int32& Index) override;
 	/* 繼承 TactCombGridActorBase End */
 	
 protected:
@@ -88,6 +90,10 @@ protected:
 	UPROPERTY()
 	TArray<AActor*> ActorsToIgnore;
 
+	// 每個 Instance 的自訂資料數量，預設 3 個
+	UPROPERTY()
+	int32 NumCustomDataFloats = 3;
+
 private:
 	// 網格 Instance 的自訂偏移向量，用於浮在地面上，避免同樣高度的物件 Z-Fighting
 	UPROPERTY()
@@ -104,4 +110,17 @@ private:
 	// 網格的左下角位置
 	UPROPERTY()
 	FVector LeftBottomCornerLocation = FVector::ZeroVector;
+
+	// 高亮時的顏色
+	UPROPERTY(EditDefaultsOnly)
+	FColor HightlightColor = FColor(30, 30, 30);
+
+	// 游標懸停時的顏色
+	UPROPERTY()
+	FColor DefaultColor = FColor::Black;
+
+	// 選取時的顏色
+	UPROPERTY(EditDefaultsOnly)
+	FColor SelectedColor = FColor::Red;
+	
 };

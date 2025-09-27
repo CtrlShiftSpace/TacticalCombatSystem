@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "TactCombPlayerController.generated.h"
 
+class IGridInterface;
 struct FGameplayTag;
 class UTactCombInputConfig;
 class ATactCombMonitorPawn;
@@ -72,5 +73,14 @@ private:
 
 	// 追蹤所偵測的物件
 	FHitResult TraceMouseHit;
+
+	// 上次與當前偵測到的網格物件
+	TScriptInterface<IGridInterface> LastGridActor;
+	TScriptInterface<IGridInterface> ThisGridActor;
+
+	// 上次與當前偵測到的網格索引
+	int32 LastInstanceIndex = INDEX_NONE;
+	int32 ThisInstanceIndex = INDEX_NONE;
+	
 	
 };

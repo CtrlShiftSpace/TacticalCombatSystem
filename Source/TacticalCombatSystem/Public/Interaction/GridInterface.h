@@ -39,5 +39,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid Interface")
 	FVector GetPivotByIndex(int32 Index) const;
 
-	
+	// 依照傳入索引進行標記
+	virtual void HighlightByIndex(const int32& Index) = 0;
+
+	// 依照傳入索引取消標記
+	virtual void UnHighlightByIndex(const int32& Index) = 0;
 };

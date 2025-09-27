@@ -13,6 +13,7 @@ ATactCombGridInstActor::ATactCombGridInstActor()
 	// 建立靜態網格元件
 	GridInstMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>("GridInstMesh");
 	GridInstMesh->SetupAttachment(RootComponent);
+	GridInstMesh->SetNumCustomDataFloats(NumCustomDataFloats);
 	if (MaxDetectHeight < MinDetectHeight)
 	{
 		// 確保最大偵測高度大於最小偵測高度
@@ -125,6 +126,32 @@ FVector ATactCombGridInstActor::GetPivotByIndex_Implementation(int32 Index) cons
 		return OutInstanceTransform.GetLocation();
 	}
 	return FVector::ZeroVector;
+}
+
+void ATactCombGridInstActor::HighlightByIndex(const int32& Index)
+{
+	Super::HighlightByIndex(Index);
+	// 設定高亮顏色
+	const FLinearColor HightlightLnColor = HightlightColor.ReinterpretAsLinear();
+	if (GridInstMesh->IsValidInstance(Index))
+	{
+		GridInstMesh->SetCustomDataValue(Index, 0, HightlightLnColor.R, true);
+		GridInstMesh->SetCustomDataValue(Index, 1, HightlightLnColor.G, true);
+		GridInstMesh->SetCustomDataValue(Index, 2, HightlightLnColor.B, true);
+	}
+}
+
+void ATactCombGridInstActor::UnHighlightByIndex(const int32& Index)
+{
+	Super::UnHighlightByIndex(Index);
+	// 恢復預設顏色
+	const FLinearColor DefaultLinearColor = DefaultColor.ReinterpretAsLinear();
+	if (GridInstMesh->IsValidInstance(Index))
+	{
+		GridInstMesh->SetCustomDataValue(Index, 0, DefaultLinearColor.R, true);
+		GridInstMesh->SetCustomDataValue(Index, 1, DefaultLinearColor.G, true);
+		GridInstMesh->SetCustomDataValue(Index, 2, DefaultLinearColor.B, true);
+	}
 }
 
 void ATactCombGridInstActor::BeginPlay()

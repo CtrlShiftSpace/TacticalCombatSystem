@@ -126,26 +126,43 @@ void ATactCombPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 void ATactCombPlayerController::TraceMouse()
 {
 	// 取得滑鼠游標在畫面中檢測到的結果
-	GetHitResultUnderCursor(ECC_Interact, false, TraceMouseHit);
-	if (!TraceMouseHit.bBlockingHit)
-	{
-		return;
-	}
+	GetHitResultUnderCursor(ECC_Visibility, false, TraceMouseHit);
 	
-	if (TraceMouseHit.GetActor()->Implements<UGridInterface>())
+	// 紀錄上次的追蹤到的網格物件
+	LastGridActor = ThisGridActor;
+	LastInstanceIndex = ThisInstanceIndex;
+	// 目前追蹤到的網格物件
+	if (TraceMouseHit.bBlockingHit && TraceMouseHit.GetActor()->Implements<UGridInterface>())
 	{
-		// 該物件屬於 InstancedStaticMeshComponent
+		ThisGridActor = TraceMouseHit.GetActor();
+		// 該物件含有 InstancedStaticMeshComponent
 		if (TraceMouseHit.Component->IsA(UInstancedStaticMeshComponent::StaticClass()))
 		{
-			// 取得偵測到的 Instance 索引
-			int32 InstanceIndex = TraceMouseHit.Item;
-			if (InstanceIndex != INDEX_NONE)
-			{
-				// 取得 Pivot 位置
-				const FVector PivotLoc = IGridInterface::Execute_GetPivotByIndex(TraceMouseHit.GetActor(), InstanceIndex);
-				// DEBUG 顯示球體顯示游標位置
-				DrawDebugSphere(GetWorld(), PivotLoc, 20.f, 12, FColor::Yellow, false, 0.1f, 0, 2.f);
-			}
+			ThisInstanceIndex = TraceMouseHit.Item;
+			// 取得 Pivot 位置
+			// const FVector PivotLoc = IGridInterface::Execute_GetPivotByIndex(TraceMouseHit.GetActor(), ThisInstanceIndex);
+		}
+		else
+		{
+			ThisInstanceIndex = INDEX_NONE;
+		}
+	}
+	else
+	{
+		ThisGridActor = nullptr;
+		ThisInstanceIndex = INDEX_NONE;
+	}
+
+	// 如果上次追蹤到的物件與這次不同，才進行高亮與取消高亮
+	if (LastGridActor != ThisGridActor || LastInstanceIndex != ThisInstanceIndex)
+	{
+		if (LastGridActor)
+		{
+			LastGridActor->UnHighlightByIndex(LastInstanceIndex);
+		}
+		if (ThisGridActor)
+		{
+			ThisGridActor->HighlightByIndex(ThisInstanceIndex);
 		}
 	}
 }

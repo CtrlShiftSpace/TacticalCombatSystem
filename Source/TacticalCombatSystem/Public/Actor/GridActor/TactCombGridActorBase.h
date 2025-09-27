@@ -29,6 +29,8 @@ public:
 	/* 覆寫 GridInterface 介面 */
 	virtual EGridTileType GetGridTileType_Implementation() const override;
 	virtual FVector GetPivotByIndex_Implementation(int32 Index) const override;
+	virtual void HighlightByIndex(const int32& Index) override {};
+	virtual void UnHighlightByIndex(const int32& Index) override {};
 	/* 覆寫 GridInterface 介面 End */
 	
 protected:
