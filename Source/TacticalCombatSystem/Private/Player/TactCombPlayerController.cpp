@@ -11,6 +11,7 @@
 #include "Interaction/GridInterface.h"
 #include "Interaction/MovementInterface.h"
 #include "TacticalCombatSystem/TacticalCombatSystem.h"
+#include "Components/InstancedStaticMeshComponent.h"
 
 ATactCombPlayerController::ATactCombPlayerController()
 {
@@ -133,10 +134,18 @@ void ATactCombPlayerController::TraceMouse()
 	
 	if (TraceMouseHit.GetActor()->Implements<UGridInterface>())
 	{
-		// TODO: 檢測是否檢測到網格
-		
-		// 顯示球體顯示游標位置
-		DrawDebugSphere(GetWorld(), TraceMouseHit.Location, 20.f, 12, FColor::Yellow, false, 0.1f, 0, 2.f);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Actor: %s"), *TraceMouseHit.GetActor()->GetName()));
+		// 該物件屬於 InstancedStaticMeshComponent
+		if (TraceMouseHit.Component->IsA(UInstancedStaticMeshComponent::StaticClass()))
+		{
+			// 取得偵測到的 Instance 索引
+			int32 InstanceIndex = TraceMouseHit.Item;
+			if (InstanceIndex != INDEX_NONE)
+			{
+				// 取得 Pivot 位置
+				const FVector PivotLoc = IGridInterface::Execute_GetPivotByIndex(TraceMouseHit.GetActor(), InstanceIndex);
+				// DEBUG 顯示球體顯示游標位置
+				DrawDebugSphere(GetWorld(), PivotLoc, 20.f, 12, FColor::Yellow, false, 0.1f, 0, 2.f);
+			}
+		}
 	}
 }

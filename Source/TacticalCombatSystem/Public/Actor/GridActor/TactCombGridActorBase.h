@@ -28,8 +28,7 @@ public:
 
 	/* 覆寫 GridInterface 介面 */
 	virtual EGridTileType GetGridTileType_Implementation() const override;
-	virtual FVector GetGridPivotLocation_Implementation() const override;
-	virtual FVector GetNearestPivotByLocation_Implementation(const FVector& InLocation) const override;
+	virtual FVector GetPivotByIndex_Implementation(int32 Index) const override;
 	/* 覆寫 GridInterface 介面 End */
 	
 protected:

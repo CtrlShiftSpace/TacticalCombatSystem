@@ -116,17 +116,13 @@ void ATactCombGridInstActor::DetectGroundInfo(FGridInstanceTile& Tile) const
 	}
 }
 
-FVector ATactCombGridInstActor::GetGridPivotLocation_Implementation() const
+FVector ATactCombGridInstActor::GetPivotByIndex_Implementation(int32 Index) const
 {
-	return CenterLocation;
-}
-
-FVector ATactCombGridInstActor::GetNearestPivotByLocation_Implementation(const FVector& InLocation) const
-{
-	int32 TileIndex = GetTileIndexFromLocation(InLocation);
-	if (GridInstTiles.IsValidIndex(TileIndex))
+	FTransform OutInstanceTransform;
+	// 取得 Instance 的 Transform
+	if (constexpr bool bWorldSpace = true; GridInstMesh->GetInstanceTransform(Index, OutInstanceTransform, bWorldSpace))
 	{
-		return GridInstTiles[TileIndex].TileTransform.GetLocation();
+		return OutInstanceTransform.GetLocation();
 	}
 	return FVector::ZeroVector;
 }
@@ -202,11 +198,4 @@ FVector ATactCombGridInstActor::GetLeftBottomCornerLocation() const
 		WidthGridNum - 1 > 0 ? (GetGridTileSize().Y * (WidthGridNum - 1)) : 0.f
 	) * 0.5f;
 	return CenterLocation - FVector(HalfGridPlaneSize.X, HalfGridPlaneSize.Y, 0.f);
-}
-
-int32 ATactCombGridInstActor::GetTileIndexFromLocation(const FVector& InLocation) const
-{
-	// TODO: 取得所在格子索引值
-	
-	return 0;
 }

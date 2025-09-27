@@ -28,14 +28,9 @@ EGridTileType ATactCombGridActorBase::GetGridTileType_Implementation() const
 	return GridTileType;
 }
 
-FVector ATactCombGridActorBase::GetGridPivotLocation_Implementation() const
+FVector ATactCombGridActorBase::GetPivotByIndex_Implementation(int32 Index) const
 {
-	return GetActorLocation();
-}
-
-FVector ATactCombGridActorBase::GetNearestPivotByLocation_Implementation(const FVector& InLocation) const
-{
-	return GetActorLocation();
+	return FVector::ZeroVector;
 }
 
 // Called when the game starts or when spawned

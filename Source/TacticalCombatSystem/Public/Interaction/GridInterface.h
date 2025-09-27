@@ -34,13 +34,10 @@ public:
 	// 取得網格類型
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid Interface")
 	EGridTileType GetGridTileType() const;
-
-	// 取得網格軸點位置，軸點不一定是中心點
+	
+	// 透過索引值取得軸點位置
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid Interface")
-	FVector GetGridPivotLocation() const;
+	FVector GetPivotByIndex(int32 Index) const;
 
-	// 透過傳入位置取得最近的軸點位置
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid Interface")
-	FVector GetNearestPivotByLocation(const FVector& InLocation) const;
 	
 };
