@@ -23,6 +23,12 @@ void FTactCombGameplayTags::InitializeNativeGameplayTags()
 		FString("Input Tag for Zooming Out")
 	);
 
+	GameplayTags.InputTag_Grid_Interact = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.Grid.Interact"),
+		FString("Input Tag for interacting on the Grid ")
+	);
+	
+
 	// Grid Tag
 	
 	GameplayTags.Grid_Shape_Triangle = UGameplayTagsManager::Get().AddNativeGameplayTag(

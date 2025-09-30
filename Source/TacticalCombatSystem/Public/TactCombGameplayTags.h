@@ -40,6 +40,8 @@ public:
 	FGameplayTag InputTag_Zoom_In;
 	// 縮小
 	FGameplayTag InputTag_Zoom_Out;
+	// 與網格互動
+	FGameplayTag InputTag_Grid_Interact;
 
 	/*
 	 * Grid Tags

@@ -90,6 +90,12 @@ void ATactCombPlayerController::Rotate(const FInputActionValue& InputActionValue
 
 void ATactCombPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (ThisGridActor != nullptr &&InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Grid_Interact))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Grid Interact"));
+		return;
+	}
+
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
 		// 確認角色是否實作了 CameraInterface
@@ -117,6 +123,7 @@ void ATactCombPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void ATactCombPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	
 }
 
 void ATactCombPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)

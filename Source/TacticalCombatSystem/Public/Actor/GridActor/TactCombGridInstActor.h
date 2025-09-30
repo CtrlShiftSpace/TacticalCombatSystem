@@ -90,9 +90,9 @@ protected:
 	UPROPERTY()
 	TArray<AActor*> ActorsToIgnore;
 
-	// 每個 Instance 的自訂資料數量，預設 3 個
+	// 每個 Instance 的自訂資料數量
 	UPROPERTY()
-	int32 NumCustomDataFloats = 3;
+	int32 NumCustomDataFloats = 4;
 
 private:
 	// 網格 Instance 的自訂偏移向量，用於浮在地面上，避免同樣高度的物件 Z-Fighting
@@ -122,5 +122,13 @@ private:
 	// 選取時的顏色
 	UPROPERTY(EditDefaultsOnly)
 	FColor SelectedColor = FColor::Red;
+
+	// 填充時的透明度
+	UPROPERTY()
+	float FillAlpha = 0.8f;
+
+	// 未填充時的透明度
+	UPROPERTY()
+	float UnFillAlpha = 0.f;
 	
 };

@@ -138,6 +138,7 @@ void ATactCombGridInstActor::HighlightByIndex(const int32& Index)
 		GridInstMesh->SetCustomDataValue(Index, 0, HightlightLnColor.R, true);
 		GridInstMesh->SetCustomDataValue(Index, 1, HightlightLnColor.G, true);
 		GridInstMesh->SetCustomDataValue(Index, 2, HightlightLnColor.B, true);
+		GridInstMesh->SetCustomDataValue(Index, 3, FillAlpha, true);
 	}
 }
 
@@ -151,6 +152,7 @@ void ATactCombGridInstActor::UnHighlightByIndex(const int32& Index)
 		GridInstMesh->SetCustomDataValue(Index, 0, DefaultLinearColor.R, true);
 		GridInstMesh->SetCustomDataValue(Index, 1, DefaultLinearColor.G, true);
 		GridInstMesh->SetCustomDataValue(Index, 2, DefaultLinearColor.B, true);
+		GridInstMesh->SetCustomDataValue(Index, 3, UnFillAlpha, true);
 	}
 }
 
