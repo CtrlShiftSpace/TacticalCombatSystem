@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Character/TactCombCharacterBase.h"
+#include "Interaction/CameraInterface.h"
 #include "TactCombCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TACTICALCOMBATSYSTEM_API ATactCombCharacter : public ATactCombCharacterBase
+class TACTICALCOMBATSYSTEM_API ATactCombCharacter : public ATactCombCharacterBase, public ICameraInterface
 {
 	GENERATED_BODY()
 

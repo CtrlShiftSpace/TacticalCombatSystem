@@ -10,8 +10,8 @@
 #include "Interaction/CameraInterface.h"
 #include "Interaction/GridInterface.h"
 #include "Interaction/MovementInterface.h"
-#include "TacticalCombatSystem/TacticalCombatSystem.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Interaction/CombatInterface.h"
 
 ATactCombPlayerController::ATactCombPlayerController()
 {
@@ -23,6 +23,20 @@ void ATactCombPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	// 每一幀都檢測滑鼠游標位置
 	TraceMouse();
+}
+
+void ATactCombPlayerController::SwitchActor(AActor* NextActor)
+{
+	// 確保下一個控制對象有效
+	if (!NextActor)
+	{
+		return;
+	}
+
+	if (APawn* NextPawn = Cast<APawn>(NextActor))
+	{
+		SetPawn(NextPawn);
+	}
 }
 
 void ATactCombPlayerController::BeginPlay()
@@ -61,6 +75,42 @@ void ATactCombPlayerController::SetupInputComponent()
 	TacticalCombatEnhInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
+void ATactCombPlayerController::UnHightlightLastActor() const
+{
+	if (!LastActor)
+	{
+		return;
+	}
+	
+	if (LastTraceActType == ETraceActType::Grid && LastIndex >= 0)
+	{
+		LastActor->UnHighlightByIndex(LastIndex);
+	}
+
+	if (LastTraceActType == ETraceActType::Character)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("UnHightlightLastActor Character"));
+	}
+}
+
+void ATactCombPlayerController::HighlightThisActor() const
+{
+	if (!ThisActor)
+	{
+		return;
+	}
+	
+	if (ThisTraceActType == ETraceActType::Grid && ThisIndex >= 0)
+	{
+		ThisActor->HighlightByIndex(ThisIndex);
+	}
+
+	if (ThisTraceActType == ETraceActType::Character)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("HightlightLastActor Character"));
+	}
+}
+
 void ATactCombPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector MoveVector = InputActionValue.Get<FVector>();
@@ -90,7 +140,7 @@ void ATactCombPlayerController::Rotate(const FInputActionValue& InputActionValue
 
 void ATactCombPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	if (ThisGridActor != nullptr &&InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Grid_Interact))
+	if (ThisActor != nullptr &&InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Grid_Interact))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Grid Interact"));
 		return;
@@ -135,41 +185,71 @@ void ATactCombPlayerController::TraceMouse()
 	// 取得滑鼠游標在畫面中檢測到的結果
 	GetHitResultUnderCursor(ECC_Visibility, false, TraceMouseHit);
 	
-	// 紀錄上次的追蹤到的網格物件
-	LastGridActor = ThisGridActor;
-	LastInstanceIndex = ThisInstanceIndex;
-	// 目前追蹤到的網格物件
-	if (TraceMouseHit.bBlockingHit && TraceMouseHit.GetActor()->Implements<UGridInterface>())
+	// 紀錄上次的追蹤到的物件
+	LastActor = ThisActor;
+	LastTraceActType = ThisTraceActType;
+	LastIndex = ThisIndex;
+
+	if (!TraceMouseHit.bBlockingHit)
 	{
-		ThisGridActor = TraceMouseHit.GetActor();
+		// 如果未有偵測到任何物件，則清空目前追蹤狀態
+		ThisTraceActType = ETraceActType::None;
+		ThisActor = nullptr;
+		ThisIndex = INDEX_NONE;
+
+		// 取消上次的標記
+		UnHightlightLastActor();
+		return;
+	}
+	
+	if (TraceMouseHit.GetActor()->Implements<UGridInterface>())
+	{
+		// 偵測到網格
+		ThisTraceActType = ETraceActType::Grid;
+		ThisActor = TraceMouseHit.GetActor();
 		// 該物件含有 InstancedStaticMeshComponent
 		if (TraceMouseHit.Component->IsA(UInstancedStaticMeshComponent::StaticClass()))
 		{
-			ThisInstanceIndex = TraceMouseHit.Item;
+			ThisIndex = TraceMouseHit.Item;
 			// 取得 Pivot 位置
 			// const FVector PivotLoc = IGridInterface::Execute_GetPivotByIndex(TraceMouseHit.GetActor(), ThisInstanceIndex);
 		}
 		else
 		{
-			ThisInstanceIndex = INDEX_NONE;
+			ThisIndex = INDEX_NONE;
+		}
+
+		// 如果上次追蹤到的物件與這次不同，取消上次的標記
+		if (LastTraceActType != ThisTraceActType)
+		{
+			UnHightlightLastActor();
+			HighlightThisActor();
+		}
+		else
+		{
+			if (ThisActor != LastActor || LastIndex != ThisIndex)
+			{
+				UnHightlightLastActor();
+				HighlightThisActor();
+			}
+		}
+	}
+	else if (TraceMouseHit.GetActor()->Implements<UCombatInterface>())
+	{
+		// 偵測到角色
+		ThisActor = TraceMouseHit.GetActor();
+		ThisTraceActType = ETraceActType::Character;
+		ThisIndex = INDEX_NONE;
+		if (LastTraceActType != ThisTraceActType || ThisActor != LastActor)
+		{
+			UnHightlightLastActor();
+			HighlightThisActor();
 		}
 	}
 	else
 	{
-		ThisGridActor = nullptr;
-		ThisInstanceIndex = INDEX_NONE;
-	}
-
-	// 如果上次追蹤到的物件與這次不同，才進行高亮與取消高亮
-	if (LastGridActor != ThisGridActor || LastInstanceIndex != ThisInstanceIndex)
-	{
-		if (LastGridActor)
-		{
-			LastGridActor->UnHighlightByIndex(LastInstanceIndex);
-		}
-		if (ThisGridActor)
-		{
-			ThisGridActor->HighlightByIndex(ThisInstanceIndex);
-		}
+		ThisActor = nullptr;
+		ThisIndex = INDEX_NONE;
+		UnHightlightLastActor();
 	}
 }

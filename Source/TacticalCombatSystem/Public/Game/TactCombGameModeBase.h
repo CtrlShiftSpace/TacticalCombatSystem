@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "TactCombGameModeBase.generated.h"
 
+class ATactCombCharacter;
 class UGridClassInfo;
 /**
  * 

@@ -15,6 +15,15 @@ class UInputMappingContext;
 struct FInputActionValue;
 class UInputAction;
 
+// 追蹤物件類型
+UENUM()
+enum ETraceActType : uint8
+{
+	None,
+	Grid,
+	Character
+};
+
 /**
  * 
  */
@@ -28,10 +37,17 @@ public:
 	ATactCombPlayerController();
 	virtual void PlayerTick(float DeltaTime);
 
+	// 切換下一個控制對象
+	void SwitchActor(AActor* NextActor);
+
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+
+	// 標記與取消標記
+	void UnHightlightLastActor() const;
+	void HighlightThisActor() const;
 	
 private:
 	
@@ -74,13 +90,16 @@ private:
 	// 追蹤所偵測的物件
 	FHitResult TraceMouseHit;
 
-	// 上次與當前偵測到的網格物件
-	TScriptInterface<IGridInterface> LastGridActor;
-	TScriptInterface<IGridInterface> ThisGridActor;
+	// 上次與當前偵測到的物件
+	TScriptInterface<IGridInterface> LastActor;
+	TScriptInterface<IGridInterface> ThisActor;
 
-	// 上次與當前偵測到的網格索引
-	int32 LastInstanceIndex = INDEX_NONE;
-	int32 ThisInstanceIndex = INDEX_NONE;
-	
+	ETraceActType LastTraceActType = ETraceActType::None;
+	ETraceActType ThisTraceActType = ETraceActType::None;
+
+	// 上次與當前偵測到的索引
+	int32 LastIndex = INDEX_NONE;
+	int32 ThisIndex = INDEX_NONE;
+
 	
 };

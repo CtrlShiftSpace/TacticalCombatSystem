@@ -30,5 +30,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ZoomOut();
+
+	// 切換攝影機
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SwitchCamera(AActor* NextViewer);
 	
 };
