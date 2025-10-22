@@ -39,6 +39,19 @@ void ATactCombPlayerController::SwitchActor(AActor* NextActor)
 	}
 }
 
+bool ATactCombPlayerController::IsSelectedGrid(const TScriptInterface<IGridInterface>& GridInterface, const int32& Index) const
+{
+	const AActor* GridActor = Cast<AActor>(GridInterface.GetObject());
+	for (const FSelectedGridInfo& Info : SelectedGrids)
+	{
+		if (Info.GridActor == GridActor && Info.GridIndex == Index)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void ATactCombPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -81,6 +94,12 @@ void ATactCombPlayerController::UnHightlightLastActor() const
 	{
 		return;
 	}
+
+	// 忽略已選取的網格
+	if (IsSelectedGrid(LastActor, LastIndex))
+	{
+		return;
+	}
 	
 	if (LastTraceActType == ETraceActType::Grid && LastIndex >= 0)
 	{
@@ -96,6 +115,12 @@ void ATactCombPlayerController::UnHightlightLastActor() const
 void ATactCombPlayerController::HighlightThisActor() const
 {
 	if (!ThisActor)
+	{
+		return;
+	}
+
+	// 忽略已選取的網格
+	if (IsSelectedGrid(ThisActor, ThisIndex))
 	{
 		return;
 	}
@@ -140,9 +165,25 @@ void ATactCombPlayerController::Rotate(const FInputActionValue& InputActionValue
 
 void ATactCombPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	if (ThisActor != nullptr &&InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Grid_Interact))
+	if (ThisActor != nullptr && InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Grid_Interact))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Grid Interact"));
+		// 先取消所有選取資料
+		for (const FSelectedGridInfo& Info : SelectedGrids)
+		{
+			if (IGridInterface* GridInterface = Cast<IGridInterface>(Info.GridActor))
+			{
+				GridInterface->DeselectedByIndex(Info.GridIndex);
+			}
+		}
+		// 清空已選取陣列
+		SelectedGrids.Empty();
+		// 建立已選取網格資料
+		FSelectedGridInfo Info;
+		Info.GridActor = Cast<AActor>(ThisActor.GetObject());
+		Info.GridIndex = ThisIndex;
+		// 加入已選取陣列中
+		SelectedGrids.Add(Info);
+		ThisActor->SelectedByIndex(ThisIndex);
 		return;
 	}
 

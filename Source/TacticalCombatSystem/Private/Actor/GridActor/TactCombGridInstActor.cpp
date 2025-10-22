@@ -156,6 +156,24 @@ void ATactCombGridInstActor::UnHighlightByIndex(const int32& Index)
 	}
 }
 
+void ATactCombGridInstActor::SelectedByIndex(const int32& Index)
+{
+	const FLinearColor SelectedLnColor = SelectedColor.ReinterpretAsLinear();
+	if (GridInstMesh->IsValidInstance(Index))
+	{
+		GridInstMesh->SetCustomDataValue(Index, 0, SelectedLnColor.R, true);
+		GridInstMesh->SetCustomDataValue(Index, 1, SelectedLnColor.G, true);
+		GridInstMesh->SetCustomDataValue(Index, 2, SelectedLnColor.B, true);
+		GridInstMesh->SetCustomDataValue(Index, 3, FillAlpha, true);
+	}
+}
+
+void ATactCombGridInstActor::DeselectedByIndex(const int32& Index)
+{
+	Super::DeselectedByIndex(Index);
+	UnHighlightByIndex(Index);
+}
+
 void ATactCombGridInstActor::BeginPlay()
 {
 	Super::BeginPlay();

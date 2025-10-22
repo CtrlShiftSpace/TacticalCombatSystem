@@ -31,6 +31,8 @@ public:
 	virtual FVector GetPivotByIndex_Implementation(int32 Index) const override;
 	virtual void HighlightByIndex(const int32& Index) override {};
 	virtual void UnHighlightByIndex(const int32& Index) override {};
+	virtual void SelectedByIndex(const int32& Index) override {};
+	virtual void DeselectedByIndex(const int32& Index) override {};
 	/* 覆寫 GridInterface 介面 End */
 	
 protected:

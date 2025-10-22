@@ -44,4 +44,9 @@ public:
 
 	// 依照傳入索引取消標記
 	virtual void UnHighlightByIndex(const int32& Index) = 0;
+
+	// 選取網格
+	virtual void SelectedByIndex(const int32& Index) = 0;
+	// 取消選取網格
+	virtual void DeselectedByIndex(const int32& Index) = 0;
 };

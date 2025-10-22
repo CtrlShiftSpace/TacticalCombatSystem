@@ -24,6 +24,21 @@ enum ETraceActType : uint8
 	Character
 };
 
+// 已選取的網格資訊
+USTRUCT()
+struct FSelectedGridInfo
+{
+	GENERATED_BODY()
+
+	// 網格物件
+	UPROPERTY()
+	AActor* GridActor = nullptr;
+
+	// 網格索引
+	UPROPERTY()
+	int32 GridIndex = INDEX_NONE;
+};
+
 /**
  * 
  */
@@ -40,6 +55,8 @@ public:
 	// 切換下一個控制對象
 	void SwitchActor(AActor* NextActor);
 
+	// 檢查網格是否已被選取
+	bool IsSelectedGrid(const TScriptInterface<IGridInterface>& GridInterface, const int32& Index) const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -101,5 +118,6 @@ private:
 	int32 LastIndex = INDEX_NONE;
 	int32 ThisIndex = INDEX_NONE;
 
-	
+	// 已選取的網格
+	TArray<FSelectedGridInfo> SelectedGrids;
 };

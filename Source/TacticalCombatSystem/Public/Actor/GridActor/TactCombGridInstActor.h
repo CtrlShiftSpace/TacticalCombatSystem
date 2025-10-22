@@ -45,6 +45,8 @@ public:
 	virtual FVector GetPivotByIndex_Implementation(int32 Index) const override;
 	virtual void HighlightByIndex(const int32& Index) override;
 	virtual void UnHighlightByIndex(const int32& Index) override;
+	virtual void SelectedByIndex(const int32& Index) override;
+	virtual void DeselectedByIndex(const int32& Index) override;
 	/* 繼承 TactCombGridActorBase End */
 	
 protected:
