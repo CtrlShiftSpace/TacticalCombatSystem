@@ -56,7 +56,7 @@ public:
 	void SwitchActor(AActor* NextActor);
 
 	// 檢查網格是否已被選取
-	bool IsSelectedGrid(const TScriptInterface<IGridInterface>& GridInterface, const int32& Index) const;
+	bool IsSelectedGrid(const AActor* GridActor, const int32& Index) const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -108,8 +108,8 @@ private:
 	FHitResult TraceMouseHit;
 
 	// 上次與當前偵測到的物件
-	TScriptInterface<IGridInterface> LastActor;
-	TScriptInterface<IGridInterface> ThisActor;
+	TObjectPtr<AActor> LastActor;
+	TObjectPtr<AActor> ThisActor;
 
 	ETraceActType LastTraceActType = ETraceActType::None;
 	ETraceActType ThisTraceActType = ETraceActType::None;

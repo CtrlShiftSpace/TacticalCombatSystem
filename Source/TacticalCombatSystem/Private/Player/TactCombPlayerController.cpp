@@ -39,9 +39,8 @@ void ATactCombPlayerController::SwitchActor(AActor* NextActor)
 	}
 }
 
-bool ATactCombPlayerController::IsSelectedGrid(const TScriptInterface<IGridInterface>& GridInterface, const int32& Index) const
+bool ATactCombPlayerController::IsSelectedGrid(const AActor* GridActor, const int32& Index) const
 {
-	const AActor* GridActor = Cast<AActor>(GridInterface.GetObject());
 	for (const FSelectedGridInfo& Info : SelectedGrids)
 	{
 		if (Info.GridActor == GridActor && Info.GridIndex == Index)
@@ -103,7 +102,10 @@ void ATactCombPlayerController::UnHightlightLastActor() const
 	
 	if (LastTraceActType == ETraceActType::Grid && LastIndex >= 0)
 	{
-		LastActor->UnHighlightByIndex(LastIndex);
+		if (IGridInterface* GridInterface = Cast<IGridInterface>(LastActor))
+		{
+			GridInterface->UnHighlightByIndex(LastIndex);
+		}
 	}
 
 	if (LastTraceActType == ETraceActType::Character)
@@ -127,7 +129,10 @@ void ATactCombPlayerController::HighlightThisActor() const
 	
 	if (ThisTraceActType == ETraceActType::Grid && ThisIndex >= 0)
 	{
-		ThisActor->HighlightByIndex(ThisIndex);
+		if (IGridInterface* GridInterface = Cast<IGridInterface>(ThisActor))
+		{
+			GridInterface->HighlightByIndex(ThisIndex);
+		}
 	}
 
 	if (ThisTraceActType == ETraceActType::Character)
@@ -179,11 +184,20 @@ void ATactCombPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 		SelectedGrids.Empty();
 		// 建立已選取網格資料
 		FSelectedGridInfo Info;
-		Info.GridActor = Cast<AActor>(ThisActor.GetObject());
+		Info.GridActor = ThisActor;
 		Info.GridIndex = ThisIndex;
 		// 加入已選取陣列中
 		SelectedGrids.Add(Info);
-		ThisActor->SelectedByIndex(ThisIndex);
+
+		// 確認角色是否實作了 CombatInterface
+		if (ThisActor->Implements<UCombatInterface>())
+		{
+			// 切換角色
+			SwitchActor(ThisActor);
+		}else if (IGridInterface* GridInterface = Cast<IGridInterface>(ThisActor))
+		{
+			GridInterface->SelectedByIndex(ThisIndex);
+		}
 		return;
 	}
 
