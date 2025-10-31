@@ -41,6 +41,10 @@ public:
 	// 偵測地面資訊
 	void DetectGroundInfo(FGridInstanceTile& Tile) const;
 
+	// 產生網格 Instance
+	UFUNCTION(BlueprintCallable, Category = "GridInst Process")
+	void SpawnGridInstance(const UGridClassInfo* GridClassInfo);
+
 	/* 繼承 TactCombGridActorBase */
 	virtual FVector GetPivotByIndex_Implementation(int32 Index) const override;
 	virtual void HighlightByIndex(const int32& Index) override;
@@ -51,10 +55,6 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
-	
-	// 產生網格 Instance
-	UFUNCTION(BlueprintCallable, Category = "GridInst Process")
-	void SpawnGridInstance(const UGridClassInfo* GridClassInfo);
 
 	// 取得單一網格大小
 	FVector2D GetGridTileSize() const;

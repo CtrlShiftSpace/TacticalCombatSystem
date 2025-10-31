@@ -11,7 +11,10 @@
 #include "Interaction/GridInterface.h"
 #include "Interaction/MovementInterface.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Game/TactCombGameModeBase.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
+
 
 ATactCombPlayerController::ATactCombPlayerController()
 {
@@ -35,7 +38,18 @@ void ATactCombPlayerController::SwitchActor(AActor* NextActor)
 
 	if (APawn* NextPawn = Cast<APawn>(NextActor))
 	{
-		SetPawn(NextPawn);
+		// 將原先的角色取消控制
+		UnPossess();
+		
+		// 改為控制傳入的角色
+		Possess(NextPawn);
+
+		// 測試用，當玩家切換到角色控制時，顯示網格
+		if (ATactCombGameModeBase* TactCombGM = Cast<ATactCombGameModeBase>(UGameplayStatics::GetGameMode(GetWorld())))
+		{
+			const FTransform TransData(NextPawn->GetActorLocation());
+			TactCombGM->ShowGridInstActor(TransData);
+		}
 	}
 }
 

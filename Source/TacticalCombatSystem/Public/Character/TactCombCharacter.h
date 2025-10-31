@@ -36,9 +36,12 @@ protected:
 	virtual void AssignMovement_Implementation(const FVector& MoveVector) override;
 	virtual void AssignRotate_Implementation(const FRotator& Rotator) override;
 	/** end Movement Interface */
+
+	// 是否為網格移動模式
+	UPROPERTY(EditDefaultsOnly)
+	bool bGridMoveMode = false;
 	
-	// 附屬於角色的網格
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Grid Class")
-	TObjectPtr<UChildActorComponent> GridInstComponent;
+	float MoveUnit = 200.f;
+	
 	
 };
