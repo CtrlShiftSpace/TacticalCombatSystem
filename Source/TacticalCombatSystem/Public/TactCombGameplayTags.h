@@ -42,7 +42,9 @@ public:
 	FGameplayTag InputTag_Zoom_Out;
 	// 與網格互動
 	FGameplayTag InputTag_Grid_Interact;
-
+	// 跳躍
+	FGameplayTag InputTag_Action_Jump;
+	
 	/*
 	 * Grid Tags
 	 */

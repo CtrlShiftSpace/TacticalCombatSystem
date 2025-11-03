@@ -29,4 +29,8 @@ public:
 	// 依照旋轉值旋轉
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void AssignRotate(const FRotator& Rotator);
+
+	// 跳躍
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Jump();
 };

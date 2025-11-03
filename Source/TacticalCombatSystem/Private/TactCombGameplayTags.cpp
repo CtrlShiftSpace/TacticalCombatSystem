@@ -27,6 +27,11 @@ void FTactCombGameplayTags::InitializeNativeGameplayTags()
 		FName("InputTag.Grid.Interact"),
 		FString("Input Tag for interacting on the Grid ")
 	);
+
+	GameplayTags.InputTag_Action_Jump = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.Action.Jump"),
+		FString("Input Tag for Jump")
+	);
 	
 
 	// Grid Tag

@@ -35,6 +35,7 @@ protected:
 	/* Movement Interface */
 	virtual void AssignMovement_Implementation(const FVector& MoveVector) override;
 	virtual void AssignRotate_Implementation(const FRotator& Rotator) override;
+	virtual void Jump_Implementation() override;
 	/** end Movement Interface */
 
 	// 是否為網格移動模式

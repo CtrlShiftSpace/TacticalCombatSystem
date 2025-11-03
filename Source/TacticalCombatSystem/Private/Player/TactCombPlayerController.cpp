@@ -184,7 +184,9 @@ void ATactCombPlayerController::Rotate(const FInputActionValue& InputActionValue
 
 void ATactCombPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	if (ThisActor != nullptr && InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Grid_Interact))
+	const FTactCombGameplayTags TactCombGameplayTags = FTactCombGameplayTags::Get();
+
+	if (ThisActor != nullptr && InputTag.MatchesTagExact(TactCombGameplayTags.InputTag_Grid_Interact))
 	{
 		// 先取消所有選取資料
 		for (const FSelectedGridInfo& Info : SelectedGrids)
@@ -217,18 +219,27 @@ void ATactCombPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
+		// 確認角色是否實作了 MovementInterface
+		if (ControlledPawn->Implements<UMovementInterface>())
+		{
+			if (InputTag.MatchesTagExact(TactCombGameplayTags.InputTag_Action_Jump))
+			{
+				IMovementInterface::Execute_Jump(ControlledPawn);
+			}
+		}
+		
 		// 確認角色是否實作了 CameraInterface
 		if (ControlledPawn->Implements<UCameraInterface>())
 		{
 			// 根據輸入標籤來決定是放大還是縮小
-			if (InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Zoom_In))
+			if (InputTag.MatchesTagExact(TactCombGameplayTags.InputTag_Zoom_In))
 			{
 				// 放大
 				ICameraInterface::Execute_ZoomIn(ControlledPawn);
 			}
 			else
 			{
-				if (InputTag.MatchesTagExact(FTactCombGameplayTags::Get().InputTag_Zoom_Out))
+				if (InputTag.MatchesTagExact(TactCombGameplayTags.InputTag_Zoom_Out))
 				{
 					// 縮小
 					ICameraInterface::Execute_ZoomOut(ControlledPawn);
