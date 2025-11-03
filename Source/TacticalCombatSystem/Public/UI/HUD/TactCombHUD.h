@@ -6,7 +6,9 @@
 #include "GameFramework/HUD.h"
 #include "TactCombHUD.generated.h"
 
-class UMVVM_BasicScreen;
+struct FViewModelScreenParams;
+class UMVVM_Overlay;
+class UMVVM_ScreenBase;
 struct FWidgetControllerParams;
 class UViewportWidgetController;
 class UAbilitySystemComponent;
@@ -21,22 +23,25 @@ class TACTICALCOMBATSYSTEM_API ATactCombHUD : public AHUD
 	GENERATED_BODY()
 
 public:
-
+	
 	UViewportWidgetController* GetViewportWidgetController(const FWidgetControllerParams& WCParam);
 
+	// 取得 Overlay 畫面的 ViewModel
+	UMVVM_Overlay* GetOverlayViewModel(const FViewModelScreenParams& VMParams);
+	
 	// 初始化 Viewport
 	void InitViewport(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
 
 protected:
 	/* MVVM 類別 */
 	UPROPERTY(EditDefaultsOnly, Category = "UI|MVVM")
-	TSubclassOf<UMVVM_BasicScreen> BasScrViewModelClass;
+	TSubclassOf<UMVVM_ScreenBase> BasScrViewModelClass;
 
 	/* end MVVM 類別 */
 
 	/* MVVM 類別物件 */
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UMVVM_BasicScreen> BasScrViewModel;
+	TObjectPtr<UMVVM_ScreenBase> BasScrViewModel;
 
 	/* end MVVM 類別物件 */
 	
@@ -57,5 +62,13 @@ private:
 	// Viewport 控制器類別
 	UPROPERTY(EditAnywhere, Category = "UI|Widget Controller")
 	TSubclassOf<UViewportWidgetController> ViewportWidgetControllerClass;
+
+	// 畫面顯示UI的 ViewModel 類別
+	UPROPERTY(EditDefaultsOnly, Category = "UI|ViewModels")
+	TSubclassOf<UMVVM_Overlay> OverlayViewModelClass;
+
+	// 畫面顯示UI的 ViewModel 物件
+	UPROPERTY()
+	TObjectPtr<UMVVM_Overlay> OverlayViewModel;
 	
 };

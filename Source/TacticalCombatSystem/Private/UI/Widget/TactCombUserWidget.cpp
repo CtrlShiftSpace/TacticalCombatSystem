@@ -8,3 +8,8 @@ void UTactCombUserWidget::SetWidgetController(UObject* InWidgetContoller)
 	WidgetController = InWidgetContoller;
 	WidgetControllerSet();
 }
+
+void UTactCombUserWidget::SetWidgetVM(UMVVM_ScreenBase* InViewModel)
+{
+	WidgetVM = InViewModel;
+}
