@@ -51,4 +51,16 @@ void FTactCombGameplayTags::InitializeNativeGameplayTags()
 		FString("Grid Tag for Hexagon Shape")
 	);
 
+	// Attributes Tag
+	
+	GameplayTags.Attributes_Primary_Vigor = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Primary.Vigor"),
+		FString("Mapping Health Attributes")
+	);
+
+	GameplayTags.Attributes_Secondary_MaxHealth = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Secondary.MaxHealth"),
+		FString("Maximum amount of Health Attributes")
+	);
+
 }

@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/TactCombPlayerState.h"
 
 ATactCombCharacter::ATactCombCharacter() : Super()
 {
@@ -38,20 +39,77 @@ ATactCombCharacter::ATactCombCharacter() : Super()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+	// 取消自動指派 AI Controller 
+	AutoPossessAI = EAutoPossessAI::Disabled;
 	
 }
 
 void ATactCombCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	
+
+	if (AbilitySystemComponent == nullptr)
+	{
+		InitAbilityActorInfo();
+		InitAttributes();
+	}
 }
 
 void ATactCombCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (AbilitySystemComponent == nullptr)
+	{
+		InitAbilityActorInfo();
+		InitAttributes();
+	}
+}
+
+void ATactCombCharacter::InitAbilityActorInfo()
+{
+	Super::InitAbilityActorInfo();
 	
+	// 先透過繼承的方法，嘗試取得 Player State，但僅限此 Character 正處於 possess 的狀態才能取到
+	APlayerState* CharacterPlayerState = GetPlayerState<APlayerState>();
+	if (!IsValid(CharacterPlayerState))
+	{
+		// 如果未取得 Player State 則改為透過 Player Controller 呼叫
+		if (const APlayerController* CharacterPlayerController = GetWorld()->GetFirstPlayerController())
+		{
+			// 嘗試取得 Player Controller 中的 Player State
+			CharacterPlayerState = CharacterPlayerController->GetPlayerState<APlayerState>();
+			if (!IsValid(CharacterPlayerState))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%s is not valid player state."), *GetName());
+				return;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s is not valid player controller."), *GetName());
+			return;
+		}
+	}
+
+	// 轉換為 ATactCombPlayerState 類別
+	ATactCombPlayerState* TactCombPlayerState = Cast<ATactCombPlayerState>(CharacterPlayerState);
+	if (!IsValid(TactCombPlayerState))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cast TactCombPlayerState class failed."));
+		return;
+	}
+	
+	// Ability 變數尚未定義，透過 Player State 取得其中的 AbilitySystemComponent 與 AttributeSet
+	if (TactCombPlayerState->GetTargetAbilitySystemComponent(this) == nullptr)
+	{
+		AbilitySystemComponent = TactCombPlayerState->AssignAbilitySystemComponent(*this);
+	}
+	if (TactCombPlayerState->GetTargetAttributeSet(this) == nullptr)
+	{
+		AttributeSet = TactCombPlayerState->AssignAttributeSet(*this);
+	}
 }
 
 void ATactCombCharacter::AssignMovement_Implementation(const FVector& MoveVector)

@@ -52,6 +52,17 @@ public:
 	FGameplayTag Grid_Shape_Square;
 	FGameplayTag Grid_Shape_Hexagon;
 
+	/*
+	 * Attributes
+	 * 影響不同屬性的 Gameplay Tag
+	 */
+
+	// 生命力
+	FGameplayTag Attributes_Primary_Vigor;
+
+	// 最大生命值
+	FGameplayTag Attributes_Secondary_MaxHealth;
+
 private:
 	// 使用 static 關鍵字來定義靜態實例，確保只有一個實例存在
 	static FTactCombGameplayTags GameplayTags;

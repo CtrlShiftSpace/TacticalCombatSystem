@@ -113,7 +113,6 @@ void ATactCombGridInstActor::DetectGroundInfo(FGridInstanceTile& Tile) const
 			// 取得網格類型
 			Tile.TileType = IGridInterface::Execute_GetGridTileType(HitResult.GetActor());
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Ground Location: %s"), *HitResult.ImpactPoint.ToString()));
 	}
 }
 
@@ -187,7 +186,12 @@ void ATactCombGridInstActor::BeginPlay()
 
 void ATactCombGridInstActor::SpawnGridInstance(const UGridClassInfo* GridClassInfo)
 {
-
+	// 只有 Server 建立
+	if (!HasAuthority())
+	{
+		return;
+	}
+	
 	// 依照設定的形狀取得網格的素材
 	const FGridClassAssetInfo& GridAssetInfo = GridClassInfo->GetGridClassAssetInfo(GridShape);
 	// 移除現有的 Instance 資訊

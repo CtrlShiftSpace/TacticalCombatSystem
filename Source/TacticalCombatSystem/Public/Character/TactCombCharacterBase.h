@@ -7,6 +7,11 @@
 #include "Interaction/CombatInterface.h"
 #include "TactCombCharacterBase.generated.h"
 
+class UCharacterClassInfoBase;
+enum class ECharacterClass : uint8;
+class UAttributeSet;
+class UAbilitySystemComponent;
+class UGameplayEffect;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -16,11 +21,12 @@ class TACTICALCOMBATSYSTEM_API ATactCombCharacterBase : public ACharacter, publi
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ATactCombCharacterBase();
 
+	// 取得 ASC
+	UAbilitySystemComponent* GetAbilitySystemComponent() const;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	// 追蹤角色攝影彈簧臂
@@ -30,4 +36,27 @@ protected:
 	// 追蹤角色攝影機
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCameraComponent> CharCam;
+
+	// 應用 GE 類別的效果給本身 Character 中的 ASC
+	void ApplyEffectClassToSelfAsc(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level = 1.f) const;
+	
+	// 初始化屬性值
+	virtual void InitAttributes();
+
+	// 初始化 Ability 相關的資訊
+	virtual void InitAbilityActorInfo();
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;
+
+	// 角色職業
+	UPROPERTY(EditAnywhere, Category = "Character Class")
+	ECharacterClass CharacterClass;
+
+	// 角色職業資訊
+	UPROPERTY(EditDefaultsOnly, Category = "Character Class")
+	TObjectPtr<UCharacterClassInfoBase> CharacterClassInfo;
 };

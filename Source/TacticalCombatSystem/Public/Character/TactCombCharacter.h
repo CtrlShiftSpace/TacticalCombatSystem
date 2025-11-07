@@ -32,6 +32,9 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	// 覆寫初始化 Ability
+	virtual void InitAbilityActorInfo() override;
+
 	/* Movement Interface */
 	virtual void AssignMovement_Implementation(const FVector& MoveVector) override;
 	virtual void AssignRotate_Implementation(const FRotator& Rotator) override;
@@ -43,6 +46,4 @@ protected:
 	bool bGridMoveMode = false;
 	
 	float MoveUnit = 200.f;
-	
-	
 };

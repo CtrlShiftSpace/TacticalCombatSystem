@@ -12,4 +12,5 @@ void UTactCombUserWidget::SetWidgetController(UObject* InWidgetContoller)
 void UTactCombUserWidget::SetWidgetVM(UMVVM_ScreenBase* InViewModel)
 {
 	WidgetVM = InViewModel;
+	WidgetVMSet();
 }
