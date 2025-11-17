@@ -6,14 +6,16 @@
 #include "Character/TactCombCharacterBase.h"
 #include "Interaction/CameraInterface.h"
 #include "Interaction/MovementInterface.h"
+#include "Interaction/PlayerInterface.h"
 #include "TactCombCharacter.generated.h"
 
+class ATactCombPlayerState;
 class ATactCombGridInstActor;
 /**
  * 
  */
 UCLASS()
-class TACTICALCOMBATSYSTEM_API ATactCombCharacter : public ATactCombCharacterBase, public ICameraInterface, public IMovementInterface
+class TACTICALCOMBATSYSTEM_API ATactCombCharacter : public ATactCombCharacterBase, public ICameraInterface, public IMovementInterface, public IPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -28,6 +30,15 @@ public:
 	 */
 	virtual void PossessedBy(AController* NewController) override;
 
+	/* Combat Interface */
+	virtual int32 GetCharacterLevel_Implementation() override;
+	/* end Combat Interface */
+
+	/* Player Interface */
+	virtual FPlayerAbilityInfo GetPlayerAbilityInfo_Implementation() const override;
+	/* end Player Interface */
+	
+	
 protected:
 	
 	virtual void BeginPlay() override;
@@ -40,6 +51,10 @@ protected:
 	virtual void AssignRotate_Implementation(const FRotator& Rotator) override;
 	virtual void Jump_Implementation() override;
 	/** end Movement Interface */
+
+	// 取得 ATactCombPlayerState
+	UFUNCTION(BlueprintPure)
+	ATactCombPlayerState* GetTactCombPlayerState() const;
 
 	// 是否為網格移動模式
 	UPROPERTY(EditDefaultsOnly)

@@ -3,12 +3,12 @@
 
 #include "AbilitySystem/TactCombAttributeSet.h"
 #include "AbilitySystemComponent.h"
+#include "TactCombGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UTactCombAttributeSet::UTactCombAttributeSet()
 {
-	// 設定生命初始值
-	InitHealth(100.f);
+	const FTactCombGameplayTags& GameplayTags = FTactCombGameplayTags::Get();
 }
 
 void UTactCombAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -22,6 +22,11 @@ void UTactCombAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(UTactCombAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTactCombAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always)
+}
+
+void UTactCombAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
 }
 
 void UTactCombAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const

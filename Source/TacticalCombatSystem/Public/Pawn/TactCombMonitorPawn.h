@@ -29,7 +29,7 @@ struct FTactCombFloatTimelineEvent
 };
 
 UCLASS()
-class TACTICALCOMBATSYSTEM_API ATactCombMonitorPawn : public APawn, public IAbilitySystemInterface, public ICameraInterface, public IMovementInterface
+class TACTICALCOMBATSYSTEM_API ATactCombMonitorPawn : public APawn, public ICameraInterface, public IMovementInterface
 {
 	GENERATED_BODY()
 
@@ -65,10 +65,6 @@ public:
 
 	// 建立 Float Timeline 元件的工具函式
 	void AssignTactCombFloatTimelineComponent(UTimelineComponent& TactCombTimelineComponent, const FTactCombFloatTimelineEvent& TactCombFloatTimelineEvent);
-
-	// 覆寫介面的GetAbilitySystemComponent
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	UAttributeSet* GetAttributeSet() const;
 	
 protected:
 
@@ -113,12 +109,6 @@ protected:
 	// 每次縮放的單位倍率
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera Tools")
 	float ZoomScaleUnit = 0.5f;
-
-	UPROPERTY()
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY()
-	TObjectPtr<UAttributeSet> AttributeSet;
 	
 private:
 	

@@ -26,6 +26,10 @@ public:
 	// 取得 ASC
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
 
+	/* Combat Interface */
+	virtual int32 GetCharacterLevel_Implementation() override;
+	/* end Combat Interface */
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -38,7 +42,7 @@ protected:
 	TObjectPtr<UCameraComponent> CharCam;
 
 	// 應用 GE 類別的效果給本身 Character 中的 ASC
-	void ApplyEffectClassToSelfAsc(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level = 1.f) const;
+	virtual void ApplyEffectClassToSelfAsc(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level = 1.f) const;
 	
 	// 初始化屬性值
 	virtual void InitAttributes();

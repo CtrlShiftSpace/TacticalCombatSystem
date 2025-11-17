@@ -208,16 +208,6 @@ void ATactCombMonitorPawn::AssignTactCombFloatTimelineComponent(UTimelineCompone
 	TactCombTimelineComponent.SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 }
 
-UAbilitySystemComponent* ATactCombMonitorPawn::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
-}
-
-UAttributeSet* ATactCombMonitorPawn::GetAttributeSet() const
-{
-	return AttributeSet;
-}
-
 float ATactCombMonitorPawn::GetZoomScale() const
 {
 	return ZoomScale;
@@ -285,19 +275,20 @@ void ATactCombMonitorPawn::InitialViewport()
 {
 	ATactCombPlayerState* TactCombPlayerState = GetPlayerState<ATactCombPlayerState>();
 	check(TactCombPlayerState);
-	AbilitySystemComponent = TactCombPlayerState->GetAbilitySystemComponent();
+	
+	// AbilitySystemComponent = TactCombPlayerState->GetAbilitySystemComponent();
 	// Cast<UTactCombAbilitySystemComponent>(TactCombPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	// AbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
-	AttributeSet = TactCombPlayerState->GetAttributeSet();
+	// AttributeSet = TactCombPlayerState->GetAttributeSet();
 
 	// 執行HUD的InitOverlay
-	if (ATactCombPlayerController* TactCombPlayerController = Cast<ATactCombPlayerController>(GetController())) {
-		// 之所以加 if 是為了處理多人玩家中其他玩家會是nullptr而不用執行以下內容，
-		if (ATactCombHUD* TactCombHUD = Cast<ATactCombHUD>(TactCombPlayerController->GetHUD()))
-		{
-			TactCombHUD->InitViewport(TactCombPlayerController, TactCombPlayerState, AbilitySystemComponent, AttributeSet);
-		}
-	}
+	// if (ATactCombPlayerController* TactCombPlayerController = Cast<ATactCombPlayerController>(GetController())) {
+	// 	// 之所以加 if 是為了處理多人玩家中其他玩家會是nullptr而不用執行以下內容，
+	// 	if (ATactCombHUD* TactCombHUD = Cast<ATactCombHUD>(TactCombPlayerController->GetHUD()))
+	// 	{
+	// 		TactCombHUD->InitViewport(TactCombPlayerController, TactCombPlayerState, AbilitySystemComponent, AttributeSet);
+	// 	}
+	// }
 }
 
 float ATactCombMonitorPawn::GetScaleSpringArmLength(const float InZoomScale) const

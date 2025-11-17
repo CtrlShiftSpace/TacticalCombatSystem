@@ -6,8 +6,6 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
 #include "AbilitySystem/Data/CharacterClassInfoBase.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
 ATactCombCharacterBase::ATactCombCharacterBase()
@@ -22,6 +20,12 @@ UAbilitySystemComponent* ATactCombCharacterBase::GetAbilitySystemComponent() con
 	return AbilitySystemComponent;
 }
 
+int32 ATactCombCharacterBase::GetCharacterLevel_Implementation()
+{
+	// 預設等級為 1
+	return 1;
+}
+
 // Called when the game starts or when spawned
 void ATactCombCharacterBase::BeginPlay()
 {
@@ -31,14 +35,14 @@ void ATactCombCharacterBase::BeginPlay()
 
 void ATactCombCharacterBase::ApplyEffectClassToSelfAsc(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const
 {
-	check(IsValid(GetAbilitySystemComponent()));
+	check(IsValid(AbilitySystemComponent));
 	check(GameplayEffectClass);
 	// 先建立 FGameplayEffectContextHandle 類別並設定效果發動來源
-	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
 	ContextHandle.AddSourceObject(this);
 	// 透過傳入 FGameplayEffectContextHandle 產生 FGameplayEffectSpecHandle 類別，設定應用效果類型與對象
-	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
-	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+	const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
+	AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), AbilitySystemComponent);
 }
 
 void ATactCombCharacterBase::InitAttributes()

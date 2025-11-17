@@ -5,10 +5,15 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/PlayerState.h"
+#include "Interaction/PlayerInterface.h"
 #include "TactCombPlayerState.generated.h"
 
 class UAttributeSet;
 class UAbilitySystemComponent;
+
+// 當玩家角色建立的 Delegate
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerCharacterSetup, const ACharacter* /* Player */)
+
 /**
  * 
  */
@@ -20,36 +25,25 @@ class TACTICALCOMBATSYSTEM_API ATactCombPlayerState : public APlayerState, publi
 public:
 	ATactCombPlayerState();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	UAttributeSet* GetAttributeSet() const;
 
-	// 指派角色 ASC
-	UAbilitySystemComponent* AssignAbilitySystemComponent(ACharacter& InPlayer);
+	// 指派玩家的資訊
+	FPlayerAbilityInfo AssignPlayerAbilityInfo(ACharacter& InPlayer);
+	// 是否存在目標玩家的資訊
+	bool HasTargetPlayerAbilityInfo(const ACharacter* InPlayer) const;
+	// 取得目標玩家的資訊
+	FPlayerAbilityInfo GetTargetPlayerAbilityInfo(const ACharacter* InPlayer) const;
+	// 每當玩家角色建立呼叫
+	void PlayerCharacterSetup(const ACharacter* Player);
 
-	// 指派角色 AS
-	UAttributeSet* AssignAttributeSet(ACharacter& InPlayer);
-	
-	// 取得目標角色的 ASC
-	UAbilitySystemComponent* GetTargetAbilitySystemComponent(const ACharacter* InPlayer);
+	/* Delegate 定義 */
+	FOnPlayerCharacterSetup OnPlayerCharacterSetup;
 
-	// 取得目標角色的 ASC
-	UAttributeSet* GetTargetAttributeSet(const ACharacter* InPlayer);
+	/* end Delegate 定義 */
+
 	
 protected:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY()
-	TObjectPtr<UAttributeSet> AttributeSet;
-
-	// 玩家控制角色的 ASC
-	UPROPERTY(VisibleAnywhere)
-	TMap<TObjectPtr<ACharacter>, TObjectPtr<UAbilitySystemComponent>> PlayerAbilitySystemComponents;
-
-	// 玩家控制角色的 AS
-	UPROPERTY()
-	TMap<TObjectPtr<ACharacter>, UAttributeSet*> PlayerAttributeSets;
-
-private:
 	
+	// 玩家控制角色在遊戲中的資訊
+	TMap<TObjectPtr<const ACharacter>, FPlayerAbilityInfo> PlayerAbilityInfoMap;
 	
 };

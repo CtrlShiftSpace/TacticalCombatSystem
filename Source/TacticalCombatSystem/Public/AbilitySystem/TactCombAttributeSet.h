@@ -27,6 +27,8 @@ public:
 	// 覆寫處理 Server 端與 Client 端同步屬性值函式
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
+	
 	/* 進行 Replication 執行的函式 */
 
 	UFUNCTION()
@@ -38,8 +40,6 @@ public:
 	UFUNCTION()
 	void OnRep_Vigor(const FGameplayAttributeData& OldVigor) const;
 	/* end 進行 Replication 執行的函式 */
-
-protected:
 
 	// 生命值
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")

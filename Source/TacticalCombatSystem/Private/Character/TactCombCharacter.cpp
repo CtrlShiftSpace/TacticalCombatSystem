@@ -3,6 +3,8 @@
 
 #include "Character/TactCombCharacter.h"
 
+#include "AbilitySystem/TactCombAbilitySystemComponent.h"
+#include "AbilitySystem/TactCombAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -42,74 +44,59 @@ ATactCombCharacter::ATactCombCharacter() : Super()
 
 	// 取消自動指派 AI Controller 
 	AutoPossessAI = EAutoPossessAI::Disabled;
-	
+
+	AbilitySystemComponent = CreateDefaultSubobject<UTactCombAbilitySystemComponent>("AbilitySystemComponent");
+	// 設定一致server 與 client的狀態會同步
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	AttributeSet = CreateDefaultSubobject<UTactCombAttributeSet>("AttributeSet");
 }
 
 void ATactCombCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+}
 
-	if (AbilitySystemComponent == nullptr)
-	{
-		InitAbilityActorInfo();
-		InitAttributes();
-	}
+int32 ATactCombCharacter::GetCharacterLevel_Implementation()
+{
+	const ATactCombPlayerState* TactCombPlayerState = GetTactCombPlayerState();
+	const FPlayerAbilityInfo& PlayerAbilityInfo = TactCombPlayerState->GetTargetPlayerAbilityInfo(this);
+	return PlayerAbilityInfo.PlayerLevel;
+}
+
+FPlayerAbilityInfo ATactCombCharacter::GetPlayerAbilityInfo_Implementation() const
+{
+	FPlayerAbilityInfo PlayerAbilityInfo;
+	PlayerAbilityInfo.ASC = AbilitySystemComponent;
+	PlayerAbilityInfo.AS = AttributeSet;
+	// TODO: 暫時先寫死，後續要改用讀取變數
+	PlayerAbilityInfo.PlayerLevel = 1;
+	return PlayerAbilityInfo;
 }
 
 void ATactCombCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (AbilitySystemComponent == nullptr)
-	{
-		InitAbilityActorInfo();
-		InitAttributes();
-	}
+	InitAbilityActorInfo();
+	InitAttributes();
 }
 
 void ATactCombCharacter::InitAbilityActorInfo()
 {
 	Super::InitAbilityActorInfo();
-	
-	// 先透過繼承的方法，嘗試取得 Player State，但僅限此 Character 正處於 possess 的狀態才能取到
-	APlayerState* CharacterPlayerState = GetPlayerState<APlayerState>();
-	if (!IsValid(CharacterPlayerState))
-	{
-		// 如果未取得 Player State 則改為透過 Player Controller 呼叫
-		if (const APlayerController* CharacterPlayerController = GetWorld()->GetFirstPlayerController())
-		{
-			// 嘗試取得 Player Controller 中的 Player State
-			CharacterPlayerState = CharacterPlayerController->GetPlayerState<APlayerState>();
-			if (!IsValid(CharacterPlayerState))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("%s is not valid player state."), *GetName());
-				return;
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%s is not valid player controller."), *GetName());
-			return;
-		}
-	}
 
-	// 轉換為 ATactCombPlayerState 類別
-	ATactCombPlayerState* TactCombPlayerState = Cast<ATactCombPlayerState>(CharacterPlayerState);
+	// 取得 Player State
+	ATactCombPlayerState* TactCombPlayerState = GetTactCombPlayerState();
 	if (!IsValid(TactCombPlayerState))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Cast TactCombPlayerState class failed."));
+		UE_LOG(LogTemp, Warning, TEXT("TactCombPlayerState is not valid."));
 		return;
 	}
-	
-	// Ability 變數尚未定義，透過 Player State 取得其中的 AbilitySystemComponent 與 AttributeSet
-	if (TactCombPlayerState->GetTargetAbilitySystemComponent(this) == nullptr)
-	{
-		AbilitySystemComponent = TactCombPlayerState->AssignAbilitySystemComponent(*this);
-	}
-	if (TactCombPlayerState->GetTargetAttributeSet(this) == nullptr)
-	{
-		AttributeSet = TactCombPlayerState->AssignAttributeSet(*this);
-	}
+
+	// 讓 Player State 知道玩家角色已建立
+	TactCombPlayerState->OnPlayerCharacterSetup.Broadcast(this);
 }
 
 void ATactCombCharacter::AssignMovement_Implementation(const FVector& MoveVector)
@@ -160,4 +147,32 @@ void ATactCombCharacter::Jump_Implementation()
 {
 	// 呼叫 ACharacter 的 Jump
 	Super::Jump();
+}
+
+ATactCombPlayerState* ATactCombCharacter::GetTactCombPlayerState() const
+{
+	// 先透過繼承的方法，嘗試取得 Player State，但僅限此 Character 正處於 possess 的狀態才能取到
+	APlayerState* CharacterPlayerState = GetPlayerState<APlayerState>();
+	if (!IsValid(CharacterPlayerState))
+	{
+		// 如果未取得 Player State 則改為透過 Player Controller 呼叫
+		if (const APlayerController* CharacterPlayerController = GetWorld()->GetFirstPlayerController())
+		{
+			// 嘗試取得 Player Controller 中的 Player State
+			CharacterPlayerState = CharacterPlayerController->GetPlayerState<APlayerState>();
+			if (!IsValid(CharacterPlayerState))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%s is not valid player state."), *GetName());
+				return nullptr;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s is not valid player controller."), *GetName());
+			return nullptr;
+		}
+	}
+
+	// 轉換為 ATactCombPlayerState 類別
+	return Cast<ATactCombPlayerState>(CharacterPlayerState);
 }

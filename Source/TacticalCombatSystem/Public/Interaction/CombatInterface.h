@@ -21,5 +21,9 @@ class TACTICALCOMBATSYSTEM_API ICombatInterface
 	GENERATED_BODY()
 
 public:
+
+	// 取得角色等級
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetCharacterLevel();
 	
 };
