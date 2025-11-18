@@ -15,21 +15,13 @@ struct FViewModelScreenParams
 	GENERATED_BODY()
 
 	FViewModelScreenParams(){}
-	FViewModelScreenParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
-		: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), AttributeSet(AS) {}
-
+	FViewModelScreenParams(APlayerController* PC, APlayerState* PS) : PlayerController(PC), PlayerState(PS) {}
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<APlayerController> PlayerController = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<APlayerState> PlayerState = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
 };
 
 /**
@@ -52,10 +44,5 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "MVVM|ScreenBase")
 	TObjectPtr<APlayerState> PlayerState;
-
-	UPROPERTY(BlueprintReadOnly, Category = "MVVM|ScreenBase")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY(BlueprintReadOnly, Category = "MVVM|ScreenBase")
-	TObjectPtr<UAttributeSet> AttributeSet;
+	
 };

@@ -281,14 +281,14 @@ void ATactCombMonitorPawn::InitialViewport()
 	// AbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
 	// AttributeSet = TactCombPlayerState->GetAttributeSet();
 
-	// 執行HUD的InitOverlay
-	// if (ATactCombPlayerController* TactCombPlayerController = Cast<ATactCombPlayerController>(GetController())) {
-	// 	// 之所以加 if 是為了處理多人玩家中其他玩家會是nullptr而不用執行以下內容，
-	// 	if (ATactCombHUD* TactCombHUD = Cast<ATactCombHUD>(TactCombPlayerController->GetHUD()))
-	// 	{
-	// 		TactCombHUD->InitViewport(TactCombPlayerController, TactCombPlayerState, AbilitySystemComponent, AttributeSet);
-	// 	}
-	// }
+	// 執行HUD的InitViewport
+	if (ATactCombPlayerController* TactCombPlayerController = Cast<ATactCombPlayerController>(GetController())) {
+		// 之所以加 if 是為了處理多人玩家中其他玩家會是nullptr而不用執行以下內容，
+		if (ATactCombHUD* TactCombHUD = Cast<ATactCombHUD>(TactCombPlayerController->GetHUD()))
+		{
+			TactCombHUD->InitViewport(TactCombPlayerController, TactCombPlayerState);
+		}
+	}
 }
 
 float ATactCombMonitorPawn::GetScaleSpringArmLength(const float InZoomScale) const

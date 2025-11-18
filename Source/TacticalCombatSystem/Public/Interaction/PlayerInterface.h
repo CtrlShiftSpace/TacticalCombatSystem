@@ -15,20 +15,20 @@ struct FPlayerAbilityInfo
 	GENERATED_BODY()
 
 	// 玩家 ASC
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> ASC = nullptr;
 
 	// 玩家 AS
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAttributeSet> AS = nullptr;
 
 	// 玩家等級
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 PlayerLevel;
 };
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, BlueprintType)
 class UPlayerInterface : public UInterface
 {
 	GENERATED_BODY()

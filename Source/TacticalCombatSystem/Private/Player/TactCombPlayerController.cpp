@@ -45,11 +45,11 @@ void ATactCombPlayerController::SwitchActor(AActor* NextActor)
 		Possess(NextPawn);
 
 		// 測試用，當玩家切換到角色控制時，顯示網格
-		if (ATactCombGameModeBase* TactCombGM = Cast<ATactCombGameModeBase>(UGameplayStatics::GetGameMode(GetWorld())))
-		{
-			const FTransform TransData(NextPawn->GetActorLocation());
-			TactCombGM->ShowGridInstActor(TransData);
-		}
+		// if (ATactCombGameModeBase* TactCombGM = Cast<ATactCombGameModeBase>(UGameplayStatics::GetGameMode(GetWorld())))
+		// {
+		// 	const FTransform TransData(NextPawn->GetActorLocation());
+		// 	TactCombGM->ShowGridInstActor(TransData);
+		// }
 	}
 }
 

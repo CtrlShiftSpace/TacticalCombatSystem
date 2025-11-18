@@ -35,7 +35,6 @@ UAbilitySystemComponent* ATactCombPlayerState::GetAbilitySystemComponent() const
 FPlayerAbilityInfo ATactCombPlayerState::AssignPlayerAbilityInfo(ACharacter& InPlayer)
 {
 	FPlayerAbilityInfo PlayerAbilityInfo;
-	// const FString ASCName = FString::Printf(TEXT("%s_ASC"), *InPlayer.GetName());
 	// 建立 ASC
 	UTactCombAbilitySystemComponent* TactCombASC = NewObject<UTactCombAbilitySystemComponent>(this, UTactCombAbilitySystemComponent::StaticClass());
 	// 動態創建需要 Register
@@ -46,7 +45,6 @@ FPlayerAbilityInfo ATactCombPlayerState::AssignPlayerAbilityInfo(ACharacter& InP
 	// 設定 Owner 為 Player Stat，Avatar 為傳入的 Character
 	TactCombASC->InitAbilityActorInfo(this, &InPlayer);
 	
-	// const FString ASName = FString::Printf(TEXT("%s_AS"), *InPlayer.GetName());
 	// 建立 AS
 	UTactCombAttributeSet* TactCombAS = NewObject<UTactCombAttributeSet>(this, UTactCombAttributeSet::StaticClass());
 	

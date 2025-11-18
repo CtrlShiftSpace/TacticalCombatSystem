@@ -30,7 +30,7 @@ public:
 	UMVVM_Overlay* GetOverlayViewModel(const FViewModelScreenParams& VMParams);
 	
 	// 初始化 Viewport
-	void InitViewport(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
+	void InitViewport(APlayerController* PC, APlayerState* PS);
 
 protected:
 	/* MVVM 類別 */

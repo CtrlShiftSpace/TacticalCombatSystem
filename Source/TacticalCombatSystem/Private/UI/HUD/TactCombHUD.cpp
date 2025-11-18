@@ -33,8 +33,7 @@ UMVVM_Overlay* ATactCombHUD::GetOverlayViewModel(const FViewModelScreenParams& V
 	return OverlayViewModel;
 }
 
-void ATactCombHUD::InitViewport(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC,
-                                UAttributeSet* AS)
+void ATactCombHUD::InitViewport(APlayerController* PC, APlayerState* PS)
 {
 	// 檢查 ViewportWidgetClass 與 ViewportWidgetControllerClass 是否已經被設定
 	checkf(ViewportWidgetClass, TEXT("Viewport Widget Class 尚未被設定，請在 BP_TactCombHUD 中設定"));
@@ -44,18 +43,13 @@ void ATactCombHUD::InitViewport(APlayerController* PC, APlayerState* PS, UAbilit
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), ViewportWidgetClass);
 	ViewportWidget = Cast<UTactCombUserWidget>(Widget);
 
-	// 建立 Viewport 的 Widget Controller
-	const FViewModelScreenParams ViewModelScreenParams(PC, PS, ASC, AS);
+	// 建立 Viewport 的 View Model
+	const FViewModelScreenParams ViewModelScreenParams(PC, PS);
 	UMVVM_Overlay* ViewModel = GetOverlayViewModel(ViewModelScreenParams);
 
-	// 設定相關的 View Model
+	// 設定 View Model
 	ViewportWidget->SetWidgetVM(ViewModel);
 	
-	// UViewportWidgetController* WidgetController = GetViewportWidgetController(WidgetControllerParams);
-
-	// 將 Viewport Widget Controller 設定為 Viewport Widget 的控制器
-	// ViewportWidget->SetWidgetController(WidgetController);
-	//
 	// 將 Viewport Widget 加入到遊戲視窗中
 	ViewportWidget->AddToViewport();
 }
